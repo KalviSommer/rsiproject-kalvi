@@ -1,0 +1,86 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<!--    <changeSet id="1" author="Siim">-->
+<!--        <createTable tableName="author">-->
+<!--            <column name="id" type="int" autoIncrement="true">-->
+<!--                <constraints primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="name" type="text"/>-->
+<!--        </createTable>-->
+
+<!--        <createTable tableName="book">-->
+<!--            <column name="id" type="int" autoIncrement="true">-->
+<!--                <constraints primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="description" type="text"/>-->
+<!--            <column name="name" type="text"/>-->
+<!--            <column name="author_id" type="int">-->
+<!--                <constraints foreignKeyName="fk_book_author" references="author(id)"/>-->
+<!--            </column>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--&lt;!&ndash; CLIENT TABLE&ndash;&gt;-->
+
+<!--    <changeSet id="2021-23-11 client table" author="Mart">-->
+<!--        <createTable tableName="client">-->
+<!--            <column name="id" type="int" autoIncrement="true">-->
+<!--                <constraints primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="first_name" type="text"/>-->
+<!--            <column name="last_name" type="text"/>-->
+<!--            <column name="address" type="text"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+
+
+<!--    &lt;!&ndash; ACCOUNTS TABLE &ndash;&gt;-->
+<!--    <changeSet id="2021-23-11 accounts table" author="Mart">-->
+<!--        <createTable tableName="bank_accounts">-->
+<!--            <column name="account_number" type="int">-->
+<!--                <constraints primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="client_id" type="int">-->
+<!--            <constraints foreignKeyName="fk_client_id" references="client(id)"/>-->
+<!--            </column>-->
+<!--            <column name="locked" type="boolean"/>-->
+<!--            <column name="balance" type="int"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+<!--    &lt;!&ndash;TRANSACTIONS TABLE &ndash;&gt;-->
+<!--    <changeSet id="2021-23-11 transactions" author="Mart">-->
+<!--        <createTable tableName="transactions">-->
+<!--            <column name="account_number" type="int" autoIncrement="true" >-->
+<!--                <constraints nullable="false"/>-->
+<!--            </column>-->
+<!--            <column name="transaction" type="text"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+<!--    &lt;!&ndash; EMPLOYEE TABLE &ndash;&gt;-->
+<!--    <changeSet id="2021-23-11" author="Mart">-->
+<!--        <createTable tableName="employee">-->
+<!--            <column name="id" type="int" autoIncrement="true">-->
+<!--                <constraints primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="first_name" type="text"/>-->
+<!--            <column name="last_name" type="text"/>-->
+<!--            <column name="position" type="text"/>-->
+<!--            <column name="address" type="text"/>-->
+<!--        </createTable>-->
+
+<!--    </changeSet>-->
+<!--    &lt;!&ndash; CLIENT TABLE add time-->
+<!--    <changeSet id="2021-24-11" author="Mart">-->
+<!--        <addColumn tableName="transactions" >-->
+<!--            <column name="time" type="timestamp" defaultValue="LOCALTIMESTAMP">-->
+
+<!--            </column>-->
+<!--        </addColumn>-->
+<!--    </changeSet>-->
+<!--&ndash;&gt;-->
+</databaseChangeLog>
