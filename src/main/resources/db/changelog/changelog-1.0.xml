@@ -5,4 +5,22 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
+    <changeSet id="7.12.2021 rsi table" author="ailen">
+        <createTable tableName="rsi_daily">
+            <column name="symbol_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="symbol" type="text"/>
+            <column name="end_date" type="text"/>
+            <column name="closing price" type="double"/>
+            <column name="gain" type="double"/>
+            <column name="loss" type="double"/>
+            <column name="avg_gain" type="double"/>
+            <column name="avg_loss" type="double"/>
+            <column name="rs" type="double"/>
+            <column name="rsi" type="double"/>
+        </createTable>
+    </changeSet>
+
+
 </databaseChangeLog>
