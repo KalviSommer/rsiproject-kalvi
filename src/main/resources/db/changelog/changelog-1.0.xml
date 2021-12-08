@@ -4,6 +4,14 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
+    <changeSet id="7.12.2021 symbols table" author="kalvi">
+        <createTable tableName="symbols">
+            <column name="symbol_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="symbols" type="text"/>
+        </createTable>
+    </changeSet>
 
     <changeSet id="7.12.2021 rsi table" author="ailen">
         <createTable tableName="rsi_daily">
@@ -20,6 +28,59 @@
             <column name="rs" type="double"/>
             <column name="rsi" type="double"/>
         </createTable>
+    </changeSet>
+
+    <changeSet id="7.12.2021 user table" author="kalvi">
+        <createTable tableName="users">
+            <column name="user_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="first_name" type="text"/>
+            <column name="last_name" type="text"/>
+            <column name="email" type="text"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="7.12.2021 add foreignkey" author="Kalvi">
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols" referencedTableName="symbols"
+                                 referencedColumnNames="symbol_id"/>
+    </changeSet>
+
+    <changeSet id="8.12.2021 new columns" author="kalvi">
+    <addColumn tableName="rsi_daily">
+        <column name="row_id" type="int" autoIncrement="true"></column>
+    </addColumn>
+    </changeSet>
+
+    <changeSet id="8.12.2021 drop columns" author="kalvi">
+        <dropColumn tableName="rsi_daily" columnName="gain"/>
+        <dropColumn tableName="rsi_daily" columnName="loss"/>
+        <dropColumn tableName="rsi_daily" columnName="avg_gain"/>
+        <dropColumn tableName="rsi_daily" columnName="avg_loss"/>
+        <dropColumn tableName="rsi_daily" columnName="symbol_id"/>
+        <dropColumn tableName="rsi_daily" columnName="rs"/>
+
+        <addColumn tableName="rsi_daily">
+            <column name="symbol_id" type="int">
+                <constraints primaryKey="true"/>
+            </column>
+        </addColumn>
+        <createTable tableName="user_symbol">
+            <column name="symbol_id" type="int">
+                <constraints primaryKey="true" foreignKeyName="fk_user_symbol_users" references="users(user_id)"/>
+            </column>
+            <column name="user_id" type="int">
+                <constraints primaryKey="true" foreignKeyName="fk_user_symbol_symbols" references="symbols(symbol_id)"/>
+            </column>
+        </createTable>
+
+        <dropForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols" referencedTableName="symbols"
+                                  referencedColumnNames="symbol_id"/>
+    </changeSet>
+
+    <changeSet id="8.12.2021 add foreignkey " author="kalvi">
+        <addForeignKeyConstraint baseTableName="rsi_daily" baseColumnNames="symbol_id" constraintName="fk_rsi_daily_symbols" referencedTableName="symbols"
+                                 referencedColumnNames="symbol_id"/>
     </changeSet>
 
 
