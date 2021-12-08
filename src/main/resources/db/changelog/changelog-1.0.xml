@@ -42,14 +42,15 @@
     </changeSet>
 
     <changeSet id="7.12.2021 add foreignkey" author="Kalvi">
-        <addForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols" referencedTableName="symbols"
+        <addForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols"
+                                 referencedTableName="symbols"
                                  referencedColumnNames="symbol_id"/>
     </changeSet>
 
     <changeSet id="8.12.2021 new columns" author="kalvi">
-    <addColumn tableName="rsi_daily">
-        <column name="row_id" type="int" autoIncrement="true"></column>
-    </addColumn>
+        <addColumn tableName="rsi_daily">
+            <column name="row_id" type="int" autoIncrement="true"></column>
+        </addColumn>
     </changeSet>
 
     <changeSet id="8.12.2021 drop columns" author="kalvi">
@@ -74,13 +75,28 @@
             </column>
         </createTable>
 
-        <dropForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols" referencedTableName="symbols"
+        <dropForeignKeyConstraint baseTableName="users" baseColumnNames="user_id" constraintName="fk_users_symbols"
+                                  referencedTableName="symbols"
                                   referencedColumnNames="symbol_id"/>
     </changeSet>
 
     <changeSet id="8.12.2021 add foreignkey " author="kalvi">
-        <addForeignKeyConstraint baseTableName="rsi_daily" baseColumnNames="symbol_id" constraintName="fk_rsi_daily_symbols" referencedTableName="symbols"
+        <addForeignKeyConstraint baseTableName="rsi_daily" baseColumnNames="symbol_id"
+                                 constraintName="fk_rsi_daily_symbols" referencedTableName="symbols"
                                  referencedColumnNames="symbol_id"/>
+    </changeSet>
+
+    <changeSet id="8.12.2021 drop columns" author="ailen">
+        <insert tableName="symbols">
+            <column name="symbols" value="BTCUSDT"></column>
+        </insert>
+        <insert tableName="symbols">
+            <column name="symbols" value="ETHUSDT"></column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="8.12.2021 symbols name change" author="ailen">
+        <renameTable oldTableName="symbols" newTableName="symbol"/>
     </changeSet>
 
 
