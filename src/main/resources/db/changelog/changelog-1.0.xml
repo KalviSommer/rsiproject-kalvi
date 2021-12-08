@@ -98,6 +98,12 @@
     <changeSet id="8.12.2021 symbols name change" author="ailen">
         <renameTable oldTableName="symbols" newTableName="symbol"/>
     </changeSet>
+    <changeSet id="8.12.2021 closing price change" author="Mart">
+        <renameColumn tableName="rsi_daily" oldColumnName="closing price" newColumnName="closing_price"/>
+    </changeSet>
+    <changeSet id="8.12.2021 rsiDaily primary key" author="Mart">
+        <dropPrimaryKey tableName="rsi_daily"/>
+    </changeSet>
 
 
 </databaseChangeLog>

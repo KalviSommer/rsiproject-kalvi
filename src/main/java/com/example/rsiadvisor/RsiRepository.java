@@ -27,6 +27,21 @@ public class RsiRepository {
         jdbcTemplate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         return (Integer) keyHolder.getKeys().get("user_id");
     }
+    public void addRsiData(RsiDto rsi) {
+        String sql = "INSERT INTO rsi_daily(symbol,end_date,closing_price,rsi,symbol_id) VALUES (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbol", rsi.getSymbol());
+        paramMap.put("endDate", rsi.getEndDate());
+        paramMap.put("closingPrice", rsi.getClosingPrice());
+        paramMap.put("rsi", rsi.getRsi());
+        paramMap.put("symbolId", rsi.getSymbolId());
+
+        jdbcTemplate.update(sql,paramMap);
+
+    }
+
+
+
 }
 
 
