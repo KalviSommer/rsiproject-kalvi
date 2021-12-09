@@ -9,8 +9,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import javax.mail.*;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 @Service
 public class RsiService {
@@ -24,7 +29,7 @@ public class RsiService {
     }
 
     //@Scheduled(fixedDelay = 1000)
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDailyBtc() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
@@ -41,13 +46,28 @@ public class RsiService {
         btcData.setSymbol("BTCUSDT");
         btcData.setEndDate("siia tuleb currentUpdateDate");
         btcData.setClosingPrice(closeHistory.get(closeHistory.size()-1));
-        btcData.setSymbolId(4);
+        btcData.setSymbolId(2);
 
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
 
     }
+    public boolean compareRsiToUserChoice(int userId,int symbolId) throws MessagingException {
+
+        RsiDto latestRsiData = rsiRepository.getRsiDailyLatest(symbolId);
+        UserSymbolDto userFilterData= rsiRepository.getUserSymbolData(userId,symbolId);
+
+        if (latestRsiData.getRsi()<userFilterData.getRsiFilter()) {
+            Email.sendEmail();
+        }
+
+
+
+        return false;
+
+    }
+
 
 
 

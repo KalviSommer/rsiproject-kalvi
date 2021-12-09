@@ -1,6 +1,7 @@
 package com.example.rsiadvisor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -37,6 +38,23 @@ public class RsiRepository {
         paramMap.put("symbolId", rsi.getSymbolId());
 
         jdbcTemplate.update(sql,paramMap);
+
+    }
+    public UserSymbolDto getUserSymbolData(int userId,int symbolId) {
+        String sql = "SELECT *FROM user_symbol WHERE user_id = :userId AND symbol_id=:symbolId";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userId", userId);
+        paramMap.put("symbolId", symbolId);
+        UserSymbolDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UserSymbolDto.class));
+        return result;
+
+    }
+    public RsiDto getRsiDailyLatest(int symbolId) {
+        String sql = "SELECT*FROM rsi_daily WHERE symbol_id = :symbolId";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
+        RsiDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(RsiDto.class));
+        return result;
 
     }
 

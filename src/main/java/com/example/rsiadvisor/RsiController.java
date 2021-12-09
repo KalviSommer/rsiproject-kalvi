@@ -1,6 +1,8 @@
 package com.example.rsiadvisor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +26,12 @@ public class RsiController {
     public String createNewUser(@RequestBody UsersDto newUser) {
 
         return rsiService.createNewUser(newUser);
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public boolean compareRsiDailyUserFilter() throws MessagingException {
+
+        return rsiService.compareRsiToUserChoice(1,1);
     }
 
 }
