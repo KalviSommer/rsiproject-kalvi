@@ -53,6 +53,9 @@ public class RsiService {
 //        System.out.println(RsiCalculator.calculate(closeHistory));
 
     }
+
+
+
     public boolean compareRsiToUserChoice(int userId,int symbolId) throws MessagingException {
 
         RsiDto latestRsiData = rsiRepository.getRsiDailyLatest(symbolId);
@@ -60,6 +63,7 @@ public class RsiService {
 
         if (latestRsiData.getRsi()<userFilterData.getRsiFilter()) {
             Email.sendEmail();
+            return true;
         }
 
 
