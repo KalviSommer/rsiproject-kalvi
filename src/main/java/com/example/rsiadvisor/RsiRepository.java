@@ -1,6 +1,7 @@
 package com.example.rsiadvisor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -38,6 +39,13 @@ public class RsiRepository {
 
         jdbcTemplate.update(sql,paramMap);
 
+    }
+
+    public UsersDto getUser(int id) {
+        String sql = "SELECT * FROM users WHERE user_id = :id";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", id);
+        return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UsersDto.class));
     }
 
 

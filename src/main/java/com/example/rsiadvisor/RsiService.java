@@ -41,14 +41,14 @@ public class RsiService {
         btcData.setSymbol("BTCUSDT");
         btcData.setEndDate("siia tuleb currentUpdateDate");
         btcData.setClosingPrice(closeHistory.get(closeHistory.size()-1));
-        btcData.setSymbolId(4);
+        btcData.setSymbolId(1);
 
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
-
     }
-
-
+    public UsersDto getUser(int id) {
+        return rsiRepository.getUser(id);
+    }
 
 }
