@@ -105,5 +105,10 @@
         <dropPrimaryKey tableName="rsi_daily"/>
     </changeSet>
 
+    <changeSet id="9.12.2021 rsi table" author="ailen">
+        <addColumn tableName="user_symbol">
+            <column name="rsi_filter" type="int"></column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
