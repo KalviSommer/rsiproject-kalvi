@@ -28,10 +28,6 @@ public class RsiController {
         return rsiService.createNewUser(newUser);
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public boolean compareRsiDailyUserFilter() throws MessagingException {
 
-        return rsiService.compareRsiToUserChoice(1,1);
-    }
 
 }

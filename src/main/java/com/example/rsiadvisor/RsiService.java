@@ -55,20 +55,13 @@ public class RsiService {
     }
 
 
-
-    public boolean compareRsiToUserChoice(int userId,int symbolId) throws MessagingException {
-
-        RsiDto latestRsiData = rsiRepository.getRsiDailyLatest(symbolId);
-        UserSymbolDto userFilterData= rsiRepository.getUserSymbolData(userId,symbolId);
-
-        if (latestRsiData.getRsi()<userFilterData.getRsiFilter()) {
-            Email.sendEmail();
-            return true;
-        }
+    //@EventListener(ApplicationReadyEvent.class)
+    public void  sendAlarmEmail()   {
+        List<Integer>UserId = rsiRepository.getAllUserRsiComparisonBtc();
 
 
 
-        return false;
+
 
     }
 
