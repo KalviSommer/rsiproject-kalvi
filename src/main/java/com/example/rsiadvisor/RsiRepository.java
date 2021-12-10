@@ -88,6 +88,15 @@ public class RsiRepository {
 
 
     }
+
+    public String getUserFirstName(int id){
+        String sql = "SELECT first_name FROM users WHERE user_id=:id";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", id);
+        return jdbcTemplate.queryForObject(sql, paramMap, String.class);
+    }
+
+
     public void deleteUserAlarmBtc(int userId) {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
