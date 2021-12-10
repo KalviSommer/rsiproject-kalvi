@@ -25,7 +25,7 @@ public class RsiService {
     }
 
     //@Scheduled(fixedDelay = 1000)
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDailyBtc() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
@@ -45,7 +45,7 @@ public class RsiService {
 
         btcData.setEndDate(date);
         btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
-        btcData.setSymbolId(2);
+        btcData.setSymbolId(1);
 
 
         rsiRepository.addRsiData(btcData);
@@ -55,7 +55,7 @@ public class RsiService {
 
 
 
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void sendAlarmEmail() throws MessagingException {
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
         for (int i = 0; i < userId.size(); i++) {

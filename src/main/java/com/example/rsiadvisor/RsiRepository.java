@@ -60,6 +60,7 @@ public class RsiRepository {
         paramMap.put("symbolId", symbolId);
         RsiDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(RsiDto.class));
         return result;
+    }
 
     public UsersDto getUser(int id) {
         String sql = "SELECT * FROM users WHERE user_id = :id";
@@ -69,11 +70,11 @@ public class RsiRepository {
     }
 
 
-    }
+
 
     public List<Integer> getAllUserRsiComparisonBtc() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND\n" +
-                "                rsi_filter < (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+                "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
 
@@ -89,7 +90,7 @@ public class RsiRepository {
     }
     public void deleteUserAlarmBtc(int userId) {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND\n" +
-                "                rsi_filter < (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+                "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
         jdbcTemplate.update(sql, paramMap);
