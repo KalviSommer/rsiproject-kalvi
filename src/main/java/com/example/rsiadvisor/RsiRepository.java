@@ -97,6 +97,15 @@ public class RsiRepository {
 
 
     }
+    public List<SymbolDto> getSymbols(){
+        String sql = "SELECT*FROM symbol";
+        Map<String, Object> paramMap = new HashMap<>();
+
+        return jdbcTemplate.query(sql, paramMap,new BeanPropertyRowMapper<>(SymbolDto.class));
+
+
+    }
+
 }
 
 

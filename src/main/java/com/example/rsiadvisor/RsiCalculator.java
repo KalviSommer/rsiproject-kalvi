@@ -7,7 +7,7 @@ public class RsiCalculator {
 
     public static double calculate(List<Double> data) {
         int periodLength = 14;
-        int lastBar = data.size() - 1;
+        int lastBar = data.size() - 2;
         int firstBar = lastBar - periodLength + 1;
 
 

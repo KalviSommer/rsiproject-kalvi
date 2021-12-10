@@ -9,6 +9,15 @@ private double closingPrice;
 private int rowId;
 private String symbol;
 
+
+    public RsiDto(int symbolId, double rsi, String endDate, double closingPrice,String symbol) {
+        this.symbolId = symbolId;
+        this.rsi = rsi;
+        this.endDate = endDate;
+        this.closingPrice = closingPrice;
+        this.symbol = symbol;
+    }
+
     public int getSymbolId() {
         return symbolId;
     }

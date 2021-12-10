@@ -2,15 +2,16 @@ package com.example.rsiadvisor;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,45 +26,50 @@ public class RsiService {
         return "New user is created and the user id is: " + a;
     }
 
-    //@Scheduled(fixedDelay = 1000)
-    //@EventListener(ApplicationReadyEvent.class)
-    public void addRsiDataDailyBtc() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
+    @Scheduled(cron = "1 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev
+    public void addRsiDataDaily() {
 
-        List elements = responseEntity.getBody();
-        List<Double> closeHistory = new ArrayList<>();
-        for (Object element : elements) {
-            List sublist = (List) element;
+        List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
-            closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Instant instant = localDateTime.atZone(ZoneId.of("GMT")).toInstant();
+        long timeInMillisNow = instant.toEpochMilli();// hetke aeg
+        long timeInMillis16 = timeInMillisNow - 1382400000;// miinus 16 p2eva, sest viimast objekti closeHistory listist ei kasuta
+
+
+        for (int i = 0; i < symbolDataList.size(); i++) {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&symbol=" + symbolDataList.get(i).getSymbols() + "&startTime=" + timeInMillis16, List.class);
+
+            List elements = responseEntity.getBody();
+            List<Double> closeHistory = new ArrayList<>();
+            List<Long> closeTimeHistory = new ArrayList<>();
+            for (Object element : elements) {
+                List sublist = (List) element;
+                closeTimeHistory.add(Long.parseLong(sublist.get(6).toString()));
+                closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
+            }
+            Long dateLong = closeTimeHistory.get(closeTimeHistory.size() - 2);    // leian viimase close aja milliseconds
+
+            final DateTimeFormatter formatter =                                   // siin convertin unixi inimloetavaks
+                    DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            final long unixTime = dateLong;
+            final String date = Instant.ofEpochMilli(unixTime)
+                    .atZone(ZoneId.of("GMT"))
+                    .format(formatter);
+
+            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), RsiCalculator.calculate(closeHistory), date, closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
+
+            System.out.println(closeHistory);
+            rsiRepository.addRsiData(symbolData);
+
         }
-        LocalDateTime dateTime = LocalDateTime.now();
-        String date = dateTime.toString();
-        RsiDto btcData = new RsiDto();
-        btcData.setRsi(RsiCalculator.calculate(closeHistory));
-        btcData.setSymbol("BTCUSDT");
-
-
-
-
-        btcData.setEndDate(date);
-        btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
-        btcData.setSymbolId(1);
-
-
-
-        rsiRepository.addRsiData(btcData);
-//        System.out.println(closeHistory);
-//        System.out.println(RsiCalculator.calculate(closeHistory));
 
     }
 
-   
 
-
-
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli
     public void sendAlarmEmail() throws MessagingException {
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
         for (int i = 0; i < userId.size(); i++) {
