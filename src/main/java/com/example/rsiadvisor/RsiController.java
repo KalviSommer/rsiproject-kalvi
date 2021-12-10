@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 
 
 @RestController
@@ -22,7 +23,7 @@ public class RsiController {
 
     //    http://localhost:8190/rsiadvisor/newuser
     @PostMapping("rsiadvisor/newuser") //ennem oli lesson5solution/account/{accountNr}
-    public String createNewUser(@RequestBody UsersDto newUser) {
+    public Integer createNewUser(@RequestBody UsersDto newUser) throws MessagingException {
 
         return rsiService.createNewUser(newUser);
     }
