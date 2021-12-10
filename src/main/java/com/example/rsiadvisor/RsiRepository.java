@@ -53,12 +53,21 @@ public class RsiRepository {
 
     }
 
+
     public RsiDto getRsiDailyLatest(int symbolId) {
         String sql = "SELECT*FROM rsi_daily WHERE symbol_id = :symbolId ORDER BY row_id desc LIMIT 1";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
         RsiDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(RsiDto.class));
         return result;
+
+    public UsersDto getUser(int id) {
+        String sql = "SELECT * FROM users WHERE user_id = :id";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", id);
+        return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UsersDto.class));
+    }
+
 
     }
 

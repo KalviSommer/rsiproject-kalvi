@@ -42,15 +42,17 @@ public class RsiService {
         RsiDto btcData = new RsiDto();
         btcData.setRsi(RsiCalculator.calculate(closeHistory));
         btcData.setSymbol("BTCUSDT");
+
         btcData.setEndDate(date);
         btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
         btcData.setSymbolId(2);
 
+
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
-
     }
+
 
 
     //@EventListener(ApplicationReadyEvent.class)
@@ -62,6 +64,11 @@ public class RsiService {
         }
 
 
+    }
+
+
+    public UsersDto getUser(int id) {
+        return rsiRepository.getUser(id);
     }
 
 
