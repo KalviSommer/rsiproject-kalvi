@@ -7,6 +7,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -41,14 +42,17 @@ public class RsiService {
         btcData.setSymbol("BTCUSDT");
         btcData.setEndDate("siia tuleb currentUpdateDate");
         btcData.setClosingPrice(closeHistory.get(closeHistory.size()-1));
-        btcData.setSymbolId(1);
+        btcData.setSymbolId(4);
 
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
+
     }
-    public UsersDto getUser(int id) {
+
+    public UsersDto getUser(@PathVariable("id") int id) {
         return rsiRepository.getUser(id);
     }
+
 
 }
