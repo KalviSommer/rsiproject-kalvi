@@ -78,9 +78,15 @@ public class RsiRepository {
 
 
     }
+    public void deleteUserAlarmBtc(int userId) {
+        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND\n" +
+                "                rsi_filter < (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userId", userId);
+        jdbcTemplate.update(sql, paramMap);
 
 
-
+    }
 }
 
 

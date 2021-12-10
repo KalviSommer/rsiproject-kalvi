@@ -9,8 +9,8 @@ import java.util.Properties;
 
 public class Email {
     @PostMapping("sendEmail") //ei tohiks olla getmapping, ainult testimiseks
-    public static void sendEmail() throws MessagingException {
-        send("martlaansalu@gmail.com", "Subject", "Test email");
+    public static void sendEmail(String email) throws MessagingException {
+        send(email, "Subject", "Test email");
     }
 
     public static void send(String toEmail, String subject, String body) throws MessagingException {
