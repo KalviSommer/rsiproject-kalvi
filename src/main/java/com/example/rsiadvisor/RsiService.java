@@ -20,10 +20,20 @@ public class RsiService {
     @Autowired
     private RsiRepository rsiRepository;
 
-    public String createNewUser(UsersDto newUser) { //ennem public String createAccount(@PathVariable("accountNr") String accountNr )
-        Integer a = rsiRepository.createNewUser(newUser);
-        return "New user is created and the user id is: " + a;
+    public Integer createNewUser(UsersDto newUser) throws MessagingException { //ennem public String createAccount(@PathVariable("accountNr") String accountNr )
+        Integer userId = rsiRepository.createNewUser(newUser);
+        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " + rsiRepository.getUserFirstName(userId) + "\n"
+                + "\n"
+                + "You have made the right choice to start using RSI advisor.\n"
+                + "RSI Advisor is simple to use and an efficient way to save Your time\n"
+                + "\n"
+                + "Please use your id: " + userId + " when logging in."
+                + "\n"
+                + "\n"
+                + "Should you have any questions, then contact us rsiadvisor.info@gmail.com");
+        return userId;
     }
+
 
     //@Scheduled(fixedDelay = 1000)
     //@EventListener(ApplicationReadyEvent.class)
@@ -43,24 +53,14 @@ public class RsiService {
         RsiDto btcData = new RsiDto();
         btcData.setRsi(RsiCalculator.calculate(closeHistory));
         btcData.setSymbol("BTCUSDT");
-
-
-
-
         btcData.setEndDate(date);
         btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
         btcData.setSymbolId(1);
-
-
-
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
 
     }
-
-   
-
 
 
     @EventListener(ApplicationReadyEvent.class)
