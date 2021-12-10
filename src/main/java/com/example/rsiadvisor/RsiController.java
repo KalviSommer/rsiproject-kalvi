@@ -28,12 +28,17 @@ public class RsiController {
         return rsiService.createNewUser(newUser);
     }
 
-
-
     // http://localhost:8190/rsiadvisor/getuser/
     @GetMapping("rsiadvisor/getuser/{id}")
     public UsersDto getUser(@PathVariable("id") int id) {
         return rsiService.getUser(id);
+    }
+
+    // http://localhost:8190/rsiadvisor/alertParams/
+    @PostMapping("rsiadvisor/alertParams/{symbolId}/{userId}/{rsiFilter}/{rsiTimeframe}")
+    public String alertParams(@PathVariable("symbolId") int symbolId, @PathVariable("userId") int userId,
+                              @PathVariable ("rsiFilter") int rsiFilter, @PathVariable("rsiTimeframe") String rsiTimeframe) {
+        return rsiService.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
     }
 
 

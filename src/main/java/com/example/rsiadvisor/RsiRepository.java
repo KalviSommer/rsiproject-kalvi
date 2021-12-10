@@ -103,8 +103,17 @@ public class RsiRepository {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
         jdbcTemplate.update(sql, paramMap);
+    }
 
-
+    public void alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
+        String sql = "INSERT INTO user_symbol (symbol_id, user_id, rsi_filter, rsi_timeframe) " +
+                "VALUES (:symbolid, :userid, :rsifilter, :rsitimeframe)";
+        Map<String, Object> bankAccountMap = new HashMap<>();
+        bankAccountMap.put("symbolid", symbolId);
+        bankAccountMap.put("userid", userId);
+        bankAccountMap.put("rsifilter", rsiFilter);
+        bankAccountMap.put("rsitimeframe", rsiTimeframe);
+        jdbcTemplate.update(sql, bankAccountMap);
     }
 }
 

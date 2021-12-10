@@ -62,7 +62,6 @@ public class RsiService {
 
     }
 
-
     @EventListener(ApplicationReadyEvent.class)
     public void sendAlarmEmail() throws MessagingException {
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
@@ -70,14 +69,14 @@ public class RsiService {
             Email.send(rsiRepository.getUserEmail(userId.get(i)), "lalala", "lalalala");
             rsiRepository.deleteUserAlarmBtc(userId.get(i));
         }
-
-
     }
 
-
     public UsersDto getUser(int id) {
+        return rsiRepository.getUser(id);}
 
-        return rsiRepository.getUser(id);
+    public String alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
+        rsiRepository.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
+        return "Alert params added to the table";
     }
 
 
