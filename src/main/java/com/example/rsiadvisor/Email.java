@@ -9,11 +9,11 @@ import java.util.Properties;
 
 public class Email {
     @PostMapping("sendEmail") //ei tohiks olla getmapping, ainult testimiseks
-    public void sendEmail() throws MessagingException {
-        send("ailenlep7@gmail.com", "Subject", "Test email");
+    public static void sendEmail(String email) throws MessagingException {
+        send(email, "Subject", "Test email");
     }
 
-    public void send(String toEmail, String subject, String body) throws MessagingException {
+    public static void send(String toEmail, String subject, String body) throws MessagingException {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.auth", true);
