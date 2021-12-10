@@ -6,6 +6,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
@@ -43,15 +44,22 @@ public class RsiService {
         btcData.setRsi(RsiCalculator.calculate(closeHistory));
         btcData.setSymbol("BTCUSDT");
 
+
+
+
         btcData.setEndDate(date);
         btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
         btcData.setSymbolId(1);
 
 
+
         rsiRepository.addRsiData(btcData);
 //        System.out.println(closeHistory);
 //        System.out.println(RsiCalculator.calculate(closeHistory));
+
     }
+
+   
 
 
 
@@ -68,6 +76,7 @@ public class RsiService {
 
 
     public UsersDto getUser(int id) {
+
         return rsiRepository.getUser(id);
     }
 
