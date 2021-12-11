@@ -115,6 +115,22 @@ public class RsiRepository {
         bankAccountMap.put("rsitimeframe", rsiTimeframe);
         jdbcTemplate.update(sql, bankAccountMap);
     }
+
+//    public AlertDto setAlert(int symbolId, int userId) {
+//        String sql = "SELECT r.symbol, r.closing_price, r.rsi, u.rsi_filter, u.rsi_timeframe FROM rsi_daily r JOIN user_symbol u\n" +
+//                "    ON r.symbol_id = u.symbol_id WHERE u.symbol_id=:symbolId  AND u.user_id=:userId ORDER BY row_id desc LIMIT 1";
+//        Map<String, Object> paramMap = new HashMap<>();
+//        paramMap.put("symbolId", symbolId);
+//        paramMap.put("userId", userId);
+//        return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
+//    }
+
+//    public BankAccount selectBalance(String accountNr) {
+//        String sql = "SELECT * FROM bank_account WHERE account_nr = :accountnr";
+//        Map<String, Object> bankAccountMap = new HashMap<>();
+//        bankAccountMap.put("accountnr", accountNr);
+//        return jdbcTemplate.queryForObject(sql, bankAccountMap, new BeanPropertyRowMapper<>(BankAccount.class));
+//    }
 }
 
 

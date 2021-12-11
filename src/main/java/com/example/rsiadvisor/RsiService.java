@@ -79,5 +79,10 @@ public class RsiService {
         return "Alert params added to the table";
     }
 
+//    public AlertDto setAlert(int symbolId, int userId) {
+//        AlertDto alertDto = rsiRepository.setAlert(symbolId, userId);
+//        return alertDto;
+//    }
+
 
 }
