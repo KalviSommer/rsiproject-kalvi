@@ -41,11 +41,11 @@ public class RsiController {
         return rsiService.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
     }
 
-//    // http://localhost:8190/rsiadvisor/setalert/
-//    @GetMapping("rsiadvisor/setalert/{symbolId}/{userId}")
-//    public AlertDto setAlert(@PathVariable("symbolId") int symbolId,
-//                           @PathVariable("userId") int userId) {
-//        return rsiService.setAlert(symbolId, userId);
-//    }
+    // http://localhost:8190/rsiadvisor/setalert/
+    @GetMapping("rsiadvisor/setalert/{symbolId}/{userId}")
+    public AlertDto setAlert(@PathVariable("symbolId") int symbolId,
+                           @PathVariable("userId") int userId) {
+        return rsiService.setAlert(symbolId, userId);
+    }
 
 }

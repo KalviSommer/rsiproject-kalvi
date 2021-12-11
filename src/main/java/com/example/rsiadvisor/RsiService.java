@@ -36,7 +36,7 @@ public class RsiService {
 
 
     //@Scheduled(fixedDelay = 1000)
-    //@EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDailyBtc() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
@@ -79,10 +79,10 @@ public class RsiService {
         return "Alert params added to the table";
     }
 
-//    public AlertDto setAlert(int symbolId, int userId) {
-//        AlertDto alertDto = rsiRepository.setAlert(symbolId, userId);
-//        return alertDto;
-//    }
+    public AlertDto setAlert(int symbolId, int userId) {
+        AlertDto alertDto = rsiRepository.setAlert(symbolId, userId);
+        return alertDto;
+    }
 
 
 }
