@@ -2,6 +2,8 @@ package com.example.rsiadvisor;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,8 @@ public class RsiService {
         return "New user is created and the user id is: " + a;
     }
 
-    @Scheduled(cron = "1 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev
+    @Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
+    @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDaily() {
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
@@ -58,19 +61,62 @@ public class RsiService {
                     .atZone(ZoneId.of("GMT"))
                     .format(formatter);
 
+            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), RsiCalculator.calculate(closeHistory),
+                    date, closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
+
+            System.out.println(closeHistory);
+            rsiRepository.addRsiDataDaily(symbolData);
+
+        }
+
+    }
+    //BTC HOURLY *******************************************************************************************************
+    @Scheduled(cron = "4 0 08/1 ? * * ")
+   @EventListener(ApplicationReadyEvent.class)
+    public void addRsiDataHourly() {
+
+        List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
+
+        LocalDateTime localDateTime = LocalDateTime.now();
+        Instant instant = localDateTime.atZone(ZoneId.of("GMT")).toInstant();
+        long timeInMillisNow = instant.toEpochMilli();// hetke aeg
+        long timeInMillis16 = timeInMillisNow - 64800000;// miinus 16 tundi, sest viimast objekti closeHistory listist ei kasuta
+
+
+        for (int i = 0; i < symbolDataList.size(); i++) {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1h&symbol=" + symbolDataList.get(i).getSymbols() + "&startTime=" + timeInMillis16, List.class);
+
+            List elements = responseEntity.getBody();
+            List<Double> closeHistory = new ArrayList<>();
+            List<Long> closeTimeHistory = new ArrayList<>();
+            for (Object element : elements) {
+                List sublist = (List) element;
+                closeTimeHistory.add(Long.parseLong(sublist.get(6).toString()));
+                closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
+            }
+            Long dateLong = closeTimeHistory.get(closeTimeHistory.size() - 2);    // leian viimase close aja milliseconds
+
+            final DateTimeFormatter formatter =                                   // siin convertin unixi inimloetavaks
+                    DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+            final long unixTime = dateLong;
+            final String date = Instant.ofEpochMilli(unixTime)
+                    .atZone(ZoneId.of("GMT+2"))
+                    .format(formatter);
+
             RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), RsiCalculator.calculate(closeHistory), date, closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
 
             System.out.println(closeHistory);
-            rsiRepository.addRsiData(symbolData);
+            rsiRepository.addRsiDataHourly(symbolData);
 
         }
 
     }
 
-
+    //SEND BTC DAILY ALARM**********************************************************************************************
     //@EventListener(ApplicationReadyEvent.class)
-    @Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli
-    public void sendAlarmEmail() throws MessagingException {
+    @Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
+    public void sendAlarmEmailBtc() throws MessagingException {
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
         for (int i = 0; i < userId.size(); i++) {
             Email.send(rsiRepository.getUserEmail(userId.get(i)), "lalala", "lalalala");
