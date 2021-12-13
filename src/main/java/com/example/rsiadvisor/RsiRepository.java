@@ -30,8 +30,20 @@ public class RsiRepository {
         return (Integer) keyHolder.getKeys().get("user_id");
     }
 
-    public void addRsiData(RsiDto rsi) {
+    public void addRsiDataDaily(RsiDto rsi) {
         String sql = "INSERT INTO rsi_daily(symbol,end_date,closing_price,rsi,symbol_id) VALUES (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbol", rsi.getSymbol());
+        paramMap.put("endDate", rsi.getEndDate());
+        paramMap.put("closingPrice", rsi.getClosingPrice());
+        paramMap.put("rsi", rsi.getRsi());
+        paramMap.put("symbolId", rsi.getSymbolId());
+
+        jdbcTemplate.update(sql, paramMap);
+
+    }
+    public void addRsiDataHourly(RsiDto rsi) {
+        String sql = "INSERT INTO rsi_hourly(symbol,end_date,closing_price,rsi,symbol_id) VALUES (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbol", rsi.getSymbol());
         paramMap.put("endDate", rsi.getEndDate());
@@ -124,6 +136,17 @@ public class RsiRepository {
         paramMap.put("userId", userId);
         return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
     }
+
+    public List<SymbolDto> getSymbols(){
+        String sql = "SELECT*FROM symbol";
+        Map<String, Object> paramMap = new HashMap<>();
+
+        return jdbcTemplate.query(sql, paramMap,new BeanPropertyRowMapper<>(SymbolDto.class));
+
+
+    }
+
+
 
 }
 

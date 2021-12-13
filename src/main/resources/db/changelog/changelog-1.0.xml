@@ -111,10 +111,12 @@
         </addColumn>
     </changeSet>
     <changeSet id="9.12.2021" author="Mart">
-        <dropForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="symbol_id" constraintName="fk_user_symbol_users"
+        <dropForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="symbol_id"
+                                  constraintName="fk_user_symbol_users"
                                   referencedTableName="users"
                                   referencedColumnNames="user_id"/>
-        <dropForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="user_id" constraintName="fk_user_symbol_symbols"
+        <dropForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="user_id"
+                                  constraintName="fk_user_symbol_symbols"
                                   referencedTableName="symbol"
                                   referencedColumnNames="symbol_id"/>
         <addForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="symbol_id" constraintName="fk_user_symbol"
@@ -124,11 +126,28 @@
                                  referencedTableName="users"
                                  referencedColumnNames="user_id"/>
     </changeSet>
+
+    <changeSet id="10.12.2021 rsi table" author="Mart">
+        <createTable tableName="rsi_hourly">
+
+            <column name="symbol" type="text"/>
+            <column name="end_date" type="text"/>
+            <column name="closing_price" type="double"/>
+            <column name="rsi" type="double"/>
+            <column name="row_id" type="int" autoIncrement="true"/>
+            <column name="symbol_id" type="int">
+                <constraints foreignKeyName="fk_rsi_hourly_symbols" references="symbol(symbol_id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
     <changeSet id="10.12.2021 add column to user_symbol" author="Kalvi">
         <addColumn tableName="user_symbol">
             <column name="rsi_timeframe" type="text">
             </column>
         </addColumn>
     </changeSet>
+
 
 </databaseChangeLog>
