@@ -4,6 +4,7 @@ public class UserSymbolDto {
     private int symbolId;
     private int userId;
     private int rsiFilter;
+    private String rsiTimeframe;
 
     public int getSymbolId() {
         return symbolId;
@@ -27,5 +28,13 @@ public class UserSymbolDto {
 
     public void setRsiFilter(int rsiFilter) {
         this.rsiFilter = rsiFilter;
+    }
+
+    public String getRsiTimeframe() {
+        return rsiTimeframe;
+    }
+
+    public void setRsiTimeframe(String rsiTimeframe) {
+        this.rsiTimeframe = rsiTimeframe;
     }
 }

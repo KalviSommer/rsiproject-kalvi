@@ -23,14 +23,31 @@ public class RsiService {
     @Autowired
     private RsiRepository rsiRepository;
 
-    public String createNewUser(UsersDto newUser) { //ennem public String createAccount(@PathVariable("accountNr") String accountNr )
-        Integer a = rsiRepository.createNewUser(newUser);
-        return "New user is created and the user id is: " + a;
+    public Integer createNewUser(UsersDto newUser) throws MessagingException { //ennem public String createAccount(@PathVariable("accountNr") String accountNr )
+        Integer userId = rsiRepository.createNewUser(newUser);
+        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " + rsiRepository.getUserFirstName(userId) + "\n"
+                + "\n"
+                + "You have made the right choice to start using RSI advisor.\n"
+                + "RSI Advisor is simple to use and an efficient way to save Your time\n"
+                + "\n"
+                + "Please use your id: " + userId + " when logging in."
+                + "\n"
+                + "\n"
+                + "Should you have any questions, then contact us rsiadvisor.info@gmail.com");
+        return userId;
     }
 
     //@Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
     //@EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDaily() {
+
+
+    //@Scheduled(fixedDelay = 1000)
+//    @EventListener(ApplicationReadyEvent.class)
+    public void addRsiDataDailyBtc() {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
+
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
@@ -68,6 +85,21 @@ public class RsiService {
             rsiRepository.addRsiDataDaily(symbolData);
 
         }
+
+            closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
+        }
+        LocalDateTime dateTime = LocalDateTime.now();
+        String date = dateTime.toString();
+        RsiDto btcData = new RsiDto();
+        btcData.setRsi(RsiCalculator.calculate(closeHistory));
+        btcData.setSymbol("BTCUSDT");
+        btcData.setEndDate(date);
+        btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
+        btcData.setSymbolId(1);
+        rsiRepository.addRsiData(btcData);
+//        System.out.println(closeHistory);
+//        System.out.println(RsiCalculator.calculate(closeHistory));
+
 
     }
     //BTC HOURLY *******************************************************************************************************
@@ -117,19 +149,28 @@ public class RsiService {
     //@EventListener(ApplicationReadyEvent.class)
     //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
     public void sendAlarmEmailBtc() throws MessagingException {
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void sendAlarmEmail() throws MessagingException {
+
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
         for (int i = 0; i < userId.size(); i++) {
             Email.send(rsiRepository.getUserEmail(userId.get(i)), "lalala", "lalalala");
             rsiRepository.deleteUserAlarmBtc(userId.get(i));
         }
-
-
     }
 
-
     public UsersDto getUser(int id) {
+        return rsiRepository.getUser(id);}
 
-        return rsiRepository.getUser(id);
+    public String alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
+        rsiRepository.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
+        return "Alert params added to the table";
+    }
+
+    public AlertDto setAlert(int symbolId, int userId) {
+        AlertDto alertDto = rsiRepository.setAlert(symbolId, userId);
+        return alertDto;
     }
 
 

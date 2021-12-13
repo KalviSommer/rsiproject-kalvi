@@ -126,6 +126,7 @@
                                  referencedTableName="users"
                                  referencedColumnNames="user_id"/>
     </changeSet>
+
     <changeSet id="10.12.2021 rsi table" author="Mart">
         <createTable tableName="rsi_hourly">
 
@@ -138,6 +139,14 @@
                 <constraints foreignKeyName="fk_rsi_hourly_symbols" references="symbol(symbol_id)"/>
             </column>
         </createTable>
+    </changeSet>
+
+
+    <changeSet id="10.12.2021 add column to user_symbol" author="Kalvi">
+        <addColumn tableName="user_symbol">
+            <column name="rsi_timeframe" type="text">
+            </column>
+        </addColumn>
     </changeSet>
 
 

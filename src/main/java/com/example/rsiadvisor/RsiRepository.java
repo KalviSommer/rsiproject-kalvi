@@ -100,15 +100,43 @@ public class RsiRepository {
 
 
     }
+
+    public String getUserFirstName(int id){
+        String sql = "SELECT first_name FROM users WHERE user_id=:id";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", id);
+        return jdbcTemplate.queryForObject(sql, paramMap, String.class);
+    }
+
+
     public void deleteUserAlarmBtc(int userId) {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
         jdbcTemplate.update(sql, paramMap);
-
-
     }
+
+    public void alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
+        String sql = "INSERT INTO user_symbol (symbol_id, user_id, rsi_filter, rsi_timeframe) " +
+                "VALUES (:symbolid, :userid, :rsifilter, :rsitimeframe)";
+        Map<String, Object> bankAccountMap = new HashMap<>();
+        bankAccountMap.put("symbolid", symbolId);
+        bankAccountMap.put("userid", userId);
+        bankAccountMap.put("rsifilter", rsiFilter);
+        bankAccountMap.put("rsitimeframe", rsiTimeframe);
+        jdbcTemplate.update(sql, bankAccountMap);
+    }
+
+    public AlertDto setAlert(int symbolId, int userId) {
+        String sql = "SELECT r.symbol, r.closing_price, r.rsi, u.rsi_filter, u.rsi_timeframe FROM rsi_daily r JOIN user_symbol u\n" +
+                "    ON r.symbol_id = u.symbol_id WHERE u.symbol_id=:symbolId  AND u.user_id=:userId ORDER BY row_id desc LIMIT 1";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
+        paramMap.put("userId", userId);
+        return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
+    }
+
     public List<SymbolDto> getSymbols(){
         String sql = "SELECT*FROM symbol";
         Map<String, Object> paramMap = new HashMap<>();
@@ -117,6 +145,8 @@ public class RsiRepository {
 
 
     }
+
+
 
 }
 
