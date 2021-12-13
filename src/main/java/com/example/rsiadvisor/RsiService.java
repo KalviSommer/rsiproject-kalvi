@@ -28,8 +28,8 @@ public class RsiService {
         return "New user is created and the user id is: " + a;
     }
 
-    @Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
-    @EventListener(ApplicationReadyEvent.class)
+    //@Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
+    //@EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDaily() {
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
@@ -71,8 +71,8 @@ public class RsiService {
 
     }
     //BTC HOURLY *******************************************************************************************************
-    @Scheduled(cron = "4 0 08/1 ? * * ")
-   @EventListener(ApplicationReadyEvent.class)
+    //@Scheduled(cron = "4 0 08/1 ? * * ")
+   //@EventListener(ApplicationReadyEvent.class)
     public void addRsiDataHourly() {
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
@@ -115,7 +115,7 @@ public class RsiService {
 
     //SEND BTC DAILY ALARM**********************************************************************************************
     //@EventListener(ApplicationReadyEvent.class)
-    @Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
+    //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
     public void sendAlarmEmailBtc() throws MessagingException {
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
         for (int i = 0; i < userId.size(); i++) {
