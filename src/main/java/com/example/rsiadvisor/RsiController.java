@@ -48,4 +48,6 @@ public class RsiController {
         return rsiService.setAlert(symbolId, userId);
     }
 
+
+
 }
