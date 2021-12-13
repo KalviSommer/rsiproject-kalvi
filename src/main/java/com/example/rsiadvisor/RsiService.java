@@ -39,16 +39,7 @@ public class RsiService {
 
     //@Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
     //@EventListener(ApplicationReadyEvent.class)
-    public void addRsiDataDaily() {
-
-
-    //@Scheduled(fixedDelay = 1000)
-//    @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDailyBtc() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1d&startTime=1637625600000&endTime=1638835200000&symbol=BNBUSDT", List.class);
-
-
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -85,26 +76,16 @@ public class RsiService {
             rsiRepository.addRsiDataDaily(symbolData);
 
         }
-
-            closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
-        }
-        LocalDateTime dateTime = LocalDateTime.now();
-        String date = dateTime.toString();
-        RsiDto btcData = new RsiDto();
-        btcData.setRsi(RsiCalculator.calculate(closeHistory));
-        btcData.setSymbol("BTCUSDT");
-        btcData.setEndDate(date);
-        btcData.setClosingPrice(closeHistory.get(closeHistory.size() - 1));
-        btcData.setSymbolId(1);
-        rsiRepository.addRsiData(btcData);
-//        System.out.println(closeHistory);
-//        System.out.println(RsiCalculator.calculate(closeHistory));
-
-
     }
+
+
+
+
+
+
     //BTC HOURLY *******************************************************************************************************
     //@Scheduled(cron = "4 0 08/1 ? * * ")
-   //@EventListener(ApplicationReadyEvent.class)
+   @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataHourly() {
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
@@ -146,11 +127,11 @@ public class RsiService {
     }
 
     //SEND BTC DAILY ALARM**********************************************************************************************
-    //@EventListener(ApplicationReadyEvent.class)
-    //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
-    public void sendAlarmEmailBtc() throws MessagingException {
 
-    @EventListener(ApplicationReadyEvent.class)
+    //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
+
+
+    //@EventListener(ApplicationReadyEvent.class)
     public void sendAlarmEmail() throws MessagingException {
 
         List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtc();
