@@ -169,7 +169,6 @@ public class RsiRepository {
         jdbcTemplate.update(sql, paramMap);
     }
 
-
 }
 
 

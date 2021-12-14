@@ -206,6 +206,7 @@ public class RsiService {
         if (rsiFilter < 1 || rsiFilter > 100) {
             throw new ApplicationException("Rsi filter should be 1 => 100!");
         }
+
         rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
         Email.send(rsiRepository.getUserEmail(userId), "Notification",
                 rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
