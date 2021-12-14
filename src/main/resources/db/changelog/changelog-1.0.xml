@@ -148,6 +148,14 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="14-12-2021" author="Mart">
+        <insert tableName="symbol">
+        <column name="symbols" value="SOLUSDT"></column>
+    </insert>
+        <insert tableName="symbol">
+            <column name="symbols" value="BNBUSDT"></column>
+        </insert>
+    </changeSet>
 
 
 </databaseChangeLog>
