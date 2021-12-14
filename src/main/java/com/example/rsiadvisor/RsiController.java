@@ -35,11 +35,11 @@ public class RsiController {
         return rsiService.getUser(id);
     }
 
-    // http://localhost:8190/rsiadvisor/alertParams/
-    @PostMapping("rsiadvisor/alertParams/{symbolId}/{userId}/{rsiFilter}/{rsiTimeframe}")
-    public String alertParams(@PathVariable("symbolId") int symbolId, @PathVariable("userId") int userId,
-                              @PathVariable ("rsiFilter") int rsiFilter, @PathVariable("rsiTimeframe") String rsiTimeframe) {
-        return rsiService.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
+    // http://localhost:8190/rsiadvisor/setAlert/
+    @PostMapping("rsiadvisor/setAlert/{symbolId}/{userId}/{rsiFilter}/{rsiTimeframe}")
+    public void setAlert(@PathVariable("symbolId") int symbolId, @PathVariable("userId") int userId,
+                              @PathVariable ("rsiFilter") int rsiFilter, @PathVariable("rsiTimeframe") String rsiTimeframe) throws MessagingException {
+        rsiService.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
     }
 
     // http://localhost:8190/rsiadvisor/alertlist/
