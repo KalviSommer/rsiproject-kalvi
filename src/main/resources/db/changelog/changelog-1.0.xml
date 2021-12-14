@@ -68,10 +68,13 @@
         </addColumn>
         <createTable tableName="user_symbol">
             <column name="symbol_id" type="int">
-                <constraints primaryKey="true" foreignKeyName="fk_user_symbol_users" references="users(user_id)"/>
+                <constraints foreignKeyName="fk_user_symbol_users" references="users(user_id)"/>
             </column>
             <column name="user_id" type="int">
-                <constraints primaryKey="true" foreignKeyName="fk_user_symbol_symbols" references="symbols(symbol_id)"/>
+                <constraints foreignKeyName="fk_user_symbol_symbols" references="symbols(symbol_id)"/>
+            </column>
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
             </column>
         </createTable>
 
@@ -107,9 +110,11 @@
 
     <changeSet id="9.12.2021 rsi table" author="ailen">
         <addColumn tableName="user_symbol">
-            <column name="rsi_filter" type="int"></column>
+            <column name="rsi_filter" type="int">
+            </column>
         </addColumn>
     </changeSet>
+
     <changeSet id="9.12.2021" author="Mart">
         <dropForeignKeyConstraint baseTableName="user_symbol" baseColumnNames="symbol_id"
                                   constraintName="fk_user_symbol_users"
@@ -140,14 +145,14 @@
             </column>
         </createTable>
     </changeSet>
-
-
     <changeSet id="10.12.2021 add column to user_symbol" author="Kalvi">
         <addColumn tableName="user_symbol">
             <column name="rsi_timeframe" type="text">
             </column>
         </addColumn>
     </changeSet>
+
+
     <changeSet id="14-12-2021" author="Mart">
         <insert tableName="symbol">
         <column name="symbols" value="SOLUSDT"></column>
@@ -156,6 +161,4 @@
             <column name="symbols" value="BNBUSDT"></column>
         </insert>
     </changeSet>
-
-
 </databaseChangeLog>
