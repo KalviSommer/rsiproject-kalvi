@@ -202,10 +202,16 @@ public class RsiService {
         return rsiRepository.getUser(id);
     }
 
-    public String alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
-        rsiRepository.alertParams(symbolId, userId, rsiFilter, rsiTimeframe);
-        return "Alert params added to the table";
+    public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe) throws MessagingException {
+        if (rsiFilter < 1 || rsiFilter > 100) {
+            throw new ApplicationException("Rsi filter should be 1 => 100!");
+        }
+        rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
+        Email.send(rsiRepository.getUserEmail(userId), "Notification",
+                rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
+                        rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
     }
+
 
     public List<AlertDto> alertList(int userId) {
         List<AlertDto> fullAlertList= new ArrayList<>();
