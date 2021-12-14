@@ -8,6 +8,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class RsiRepository {
         jdbcTemplate.update(sql, paramMap);
 
     }
+
     public void addRsiDataHourly(RsiDto rsi) {
         String sql = "INSERT INTO rsi_hourly(symbol,end_date,closing_price,rsi,symbol_id) VALUES (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
         Map<String, Object> paramMap = new HashMap<>();
@@ -82,8 +84,6 @@ public class RsiRepository {
     }
 
 
-
-
     public List<Integer> getAllUserRsiComparisonBtc() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
@@ -92,7 +92,7 @@ public class RsiRepository {
 
     }
 
-    public String getUserEmail(int id){
+    public String getUserEmail(int id) {
         String sql = "SELECT email FROM users WHERE user_id=:id";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("id", id);
@@ -101,7 +101,7 @@ public class RsiRepository {
 
     }
 
-    public String getUserFirstName(int id){
+    public String getUserFirstName(int id) {
         String sql = "SELECT first_name FROM users WHERE user_id=:id";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("id", id);
@@ -128,24 +128,26 @@ public class RsiRepository {
         jdbcTemplate.update(sql, bankAccountMap);
     }
 
-    public AlertDto setAlert(int symbolId, int userId) {
-        String sql = "SELECT r.symbol, r.closing_price, r.rsi, u.rsi_filter, u.rsi_timeframe FROM rsi_daily r JOIN user_symbol u\n" +
-                "    ON r.symbol_id = u.symbol_id WHERE u.symbol_id=:symbolId  AND u.user_id=:userId ORDER BY row_id desc LIMIT 1";
+    public List<AlertDto> alertList(int userId, String timeframe, String tableName) {
+        String sql = "WITH all_alerts AS (SELECT *, ROW_NUMBER() OVER(PARTITION BY r.symbol_id, u.rsi_timeframe  ORDER BY r.end_date DESC) AS rn FROM user_symbol u JOIN " + tableName + " r ON u.symbol_id = r.symbol_id WHERE u.user_id=:userId AND u.rsi_timeframe=:rsiTimeframe) select * from all_alerts where rn=1";
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("symbolId", symbolId);
         paramMap.put("userId", userId);
-        return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
+        paramMap.put("rsiTimeframe", timeframe);
+        return jdbcTemplate.query(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
     }
 
-    public List<SymbolDto> getSymbols(){
+    public List<SymbolDto> getSymbols() {
         String sql = "SELECT*FROM symbol";
         Map<String, Object> paramMap = new HashMap<>();
-
-        return jdbcTemplate.query(sql, paramMap,new BeanPropertyRowMapper<>(SymbolDto.class));
-
-
+        return jdbcTemplate.query(sql, paramMap, new BeanPropertyRowMapper<>(SymbolDto.class));
     }
 
+    public void deleteAlert(int n) {
+        String sql = "DELETE FROM user_symbol WHERE id = :id";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", n);
+        jdbcTemplate.update(sql, paramMap);
+    }
 
 
 }

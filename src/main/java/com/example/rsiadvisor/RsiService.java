@@ -15,7 +15,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RsiService {
@@ -38,7 +40,7 @@ public class RsiService {
     }
 
     //@Scheduled(cron = "10 0 22 ? * * ")           //sekund p2rast syda88d iga p2ev,GMT aeg
-    //@EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataDailyBtc() {
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
@@ -85,7 +87,7 @@ public class RsiService {
 
     //BTC HOURLY *******************************************************************************************************
     //@Scheduled(cron = "4 0 08/1 ? * * ")
-   @EventListener(ApplicationReadyEvent.class)
+//   @EventListener(ApplicationReadyEvent.class)
     public void addRsiDataHourly() {
 
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
@@ -149,9 +151,15 @@ public class RsiService {
         return "Alert params added to the table";
     }
 
-    public AlertDto setAlert(int symbolId, int userId) {
-        AlertDto alertDto = rsiRepository.setAlert(symbolId, userId);
-        return alertDto;
+    public List<AlertDto> alertList(int userId) {
+        List<AlertDto> fullAlertList= new ArrayList<>();
+        fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
+        fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
+        return fullAlertList;
+    }
+
+    public void deleteAlert(int n) {
+        rsiRepository.deleteAlert(n);
     }
 
 
