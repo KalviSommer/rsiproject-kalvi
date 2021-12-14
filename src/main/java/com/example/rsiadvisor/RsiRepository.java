@@ -84,31 +84,27 @@ public class RsiRepository {
     }
 
 
-//BTC ALARM COMPARSION DAILY***************************************************************************
-    public List<Integer> getAllUserRsiComparisonBtcDaily() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
-        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND rsi_timeframe='1d' AND\n" +
+// ALARM COMPARSION DAILY***************************************************************************
+    public List<Integer> getAllUserRsiComparisonDaily(int symbolId) {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
+        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe='1D' AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
 
     }
-    //BTC ALARM COMPARSION HOURLY
-    public List<Integer> getAllUserRsiComparisonBtcHourly() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
-        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND rsi_timeframe='1h' AND\n" +
+    // ALARM COMPARSION HOURLY
+    public List<Integer> getAllUserRsiComparisonHourly(int symbolId) {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
+        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe='1H' AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_hourly WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
     }
 
-    //ETH ALARM COMPARSION DAILY***************************************************************************
-    public List<Integer> getAllUserRsiComparisonEthDaily() {
-        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 2 AND rsi_timeframe='1d' AND\n" +
 
-                "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
-        Map<String, Object> paramMap = new HashMap<>();
-        return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
 
-    }
+
 
     public String getUserEmail(int id) {
         String sql = "SELECT email FROM users WHERE user_id=:id";
@@ -126,19 +122,18 @@ public class RsiRepository {
         return jdbcTemplate.queryForObject(sql, paramMap, String.class);
     }
 
+// Tsyklilise kontrolli alarmi kustutamine
+    public void deleteUserAlarm(int userId,int symbolId,String rsiTimeframe,String rsiTable) {
+        String sql = "DELETE FROM user_symbol WHERE symbol_id = :symbolId AND user_id=:userId AND rsi_timeframe=:rsiTimeframe AND rsi_filter > (SELECT rsi FROM" + rsiTable + " WHERE symbol_id = :symbolId ORDER BY row_id desc LIMIT 1)";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userId", userId);
+        paramMap.put("symbolId", symbolId);
+        paramMap.put("rsiTimeframe", rsiTimeframe);
+        paramMap.put("rsiTable", rsiTable);
 
-    public void deleteUserAlarmBtcDaily(int userId) {
-        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND rsi_timeframe='1d'";
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("userId", userId);
         jdbcTemplate.update(sql, paramMap);
     }
-    public void deleteUserAlarmBtcHourly(int userId) {
-        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND rsi_timeframe='1h'";
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("userId", userId);
-        jdbcTemplate.update(sql, paramMap);
-    }
+
 
     public void alertParams(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
         String sql = "INSERT INTO user_symbol (symbol_id, user_id, rsi_filter, rsi_timeframe) " +
