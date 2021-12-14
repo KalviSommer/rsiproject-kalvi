@@ -84,8 +84,26 @@ public class RsiRepository {
     }
 
 
-    public List<Integer> getAllUserRsiComparisonBtc() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
-        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND\n" +
+//BTC ALARM COMPARSION DAILY***************************************************************************
+    public List<Integer> getAllUserRsiComparisonBtcDaily() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
+        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND rsi_timeframe='1d' AND\n" +
+                "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+        Map<String, Object> paramMap = new HashMap<>();
+        return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
+
+    }
+    //BTC ALARM COMPARSION HOURLY
+    public List<Integer> getAllUserRsiComparisonBtcHourly() {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
+        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 1 AND rsi_timeframe='1h' AND\n" +
+                "                rsi_filter > (SELECT rsi FROM rsi_hourly WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+        Map<String, Object> paramMap = new HashMap<>();
+        return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
+    }
+
+    //ETH ALARM COMPARSION DAILY***************************************************************************
+    public List<Integer> getAllUserRsiComparisonEthDaily() {
+        String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = 2 AND rsi_timeframe='1d' AND\n" +
+
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
@@ -109,9 +127,14 @@ public class RsiRepository {
     }
 
 
-    public void deleteUserAlarmBtc(int userId) {
-        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND\n" +
-                "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
+    public void deleteUserAlarmBtcDaily(int userId) {
+        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND rsi_timeframe='1d'";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userId", userId);
+        jdbcTemplate.update(sql, paramMap);
+    }
+    public void deleteUserAlarmBtcHourly(int userId) {
+        String sql = "DELETE FROM user_symbol WHERE symbol_id = 1 AND user_id=:userId AND rsi_timeframe='1h'";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
         jdbcTemplate.update(sql, paramMap);
