@@ -201,6 +201,7 @@ public class RsiService {
         if (rsiFilter < 1 || rsiFilter > 100) {
             throw new ApplicationException("Rsi filter should be 1 => 100!");
         }
+
         if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe) > 0) {
 
             rsiRepository.updateUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe);
@@ -211,8 +212,7 @@ public class RsiService {
                     rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
                             rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
         }
-
-
+ 
     }
 
 

@@ -181,6 +181,7 @@ public class RsiRepository {
     }
 
 
+
     public void updateUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
         String sql = "UPDATE user_symbol SET rsi_filter=:rsiFilter WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_timeframe=:rsiTimeframe";
         Map<String, Object> paramMap = new HashMap<>();
@@ -190,6 +191,7 @@ public class RsiRepository {
         paramMap.put("rsiTimeframe", rsiTimeframe);
         jdbcTemplate.update(sql, paramMap);
     }
+
 }
 
 
