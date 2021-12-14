@@ -1,6 +1,8 @@
 package com.example.rsiadvisor;
 
 
+import netscape.javascript.JSObject;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -15,9 +17,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class RsiService {
@@ -39,20 +39,33 @@ public class RsiService {
         return userId;
     }
 
+    //CURRENT PRICE TO TABLE *****************************************
+    //@EventListener(ApplicationReadyEvent.class)
+    public void addCurrentPriceTable() {
+
+
+    RestTemplate currentPrice = new RestTemplate();
+    ResponseEntity<Object> responseEntity = currentPrice.getForEntity("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT" , Object.class);
+
+    double priceString = Double.parseDouble(responseEntity.getBody().toString().substring(23,31));
+        System.out.println(priceString);
+
+
+
+    }
+
+
+//DAILY*********************************
 
     @Scheduled(cron = "10 0 22 ? * * ")           //10 sekund p2rast syda88d iga p2ev,GMT aeg
     //@EventListener(ApplicationReadyEvent.class)
-
-    public void addRsiDataDailyBtc() {
+    public void addRsiDataDaily() {
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
         LocalDateTime localDateTime = LocalDateTime.now();
         Instant instant = localDateTime.atZone(ZoneId.of("GMT")).toInstant();
         long timeInMillisNow = instant.toEpochMilli();// hetke aeg
         long timeInMillis16 = timeInMillisNow - 1382400000;// miinus 16 p2eva, sest viimast objekti closeHistory listist ei kasuta
-
-
-
 
 
         for (int i = 0; i < symbolDataList.size(); i++) {
@@ -95,7 +108,7 @@ public class RsiService {
 
 
     //HOURLY *******************************************************************************************************
-    @Scheduled(cron = "4 0 08/1 ? * * ")
+    @Scheduled(cron = "10 0 08/1 ? * * ")
     //@EventListener(ApplicationReadyEvent.class)
 
     public void addRsiDataHourly() {
@@ -147,42 +160,43 @@ public class RsiService {
 
     }
 
-    //SEND BTC DAILY ALARM**********************************************************************************************
+    //SEND DAILY ALARM**********************************************************************************************
 
-    //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
+    @Scheduled(cron = "30 0 22 ? * * ")                  // iga p2ev p2rast syda88d 30 sekundit teeb kontrolli,GMT
     //@EventListener(ApplicationReadyEvent.class)
-    public void BtcSendAlarmEmailDaily() throws MessagingException {
+    public void SendAlarmEmailDaily() throws MessagingException {
 
-        List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtcDaily();
-        for (int i = 0; i < userId.size(); i++) {
-            Email.send(rsiRepository.getUserEmail(userId.get(i)), "BTC daily", "Your daily timeframe BTC alarm was triggered");
-            rsiRepository.deleteUserAlarmBtcDaily(userId.get(i));
+        List<SymbolDto>symbolList=rsiRepository.getSymbols();
+        for(int j = 0 ;j<symbolList.size();j++) {
+
+            List<Integer> userId = rsiRepository.getAllUserRsiComparisonDaily(symbolList.get(j).getSymbolId());
+
+            for (int i = 0; i < userId.size(); i++) {
+                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() +" daily ", "Your Daily timeframe "+symbolList.get(j).getSymbols()+" alarm was triggered.");
+                rsiRepository.deleteUserAlarm(userId.get(i),symbolList.get(j).getSymbolId(),"1D"," rsi_daily ");
+            }
         }
     }
-    //SEND BTC HOURLY ALARM**********************************************************************************************
+    //SEND HOURLY ALARM**********************************************************************************************
 
-    //@Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
+    @Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
     //@EventListener(ApplicationReadyEvent.class)
-    public void BtcSendAlarmEmailHourly() throws MessagingException {
+    public void SendAlarmEmailHourly() throws MessagingException {
 
-        List<Integer> userId = rsiRepository.getAllUserRsiComparisonBtcHourly();
-        for (int i = 0; i < userId.size(); i++) {
-            Email.send(rsiRepository.getUserEmail(userId.get(i)), "BTC hourly ", "Your hourly timeframe BTC alarm was triggered.");
-            rsiRepository.deleteUserAlarmBtcHourly(userId.get(i));
+        List<SymbolDto>symbolList=rsiRepository.getSymbols();
+        for(int j = 0 ;j<symbolList.size();j++) {
+
+
+            List<Integer> userId = rsiRepository.getAllUserRsiComparisonHourly(symbolList.get(j).getSymbolId());
+
+            for (int i = 0; i < userId.size(); i++) {
+                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() +"  hourly ", "Your hourly timeframe "+symbolList.get(j).getSymbols()+" alarm was triggered.");
+                rsiRepository.deleteUserAlarm(userId.get(i),symbolList.get(j).getSymbolId(),"1H"," rsi_hourly ");
+            }
         }
     }
-    //SEND ETH DAILY ALARM**********************************************************************************************
 
-    //@Scheduled(cron = "5 0 22 ? * * ")                  // iga p2ev p2rast syda88d 5 sekundit teeb kontrolli,GMT
-   // @EventListener(ApplicationReadyEvent.class)
-    public void EthSendAlarmEmailDaily() throws MessagingException {
 
-        List<Integer> userId = rsiRepository.getAllUserRsiComparisonEthDaily();
-        for (int i = 0; i < userId.size(); i++) {
-            Email.send(rsiRepository.getUserEmail(userId.get(i)), "ETH daily ", "Your Daily timeframe ETH alarm was triggered.");
-            //rsiRepository.deleteUserAlarmEthDaily(userId.get(i));
-        }
-    }
 
     public UsersDto getUser(int id) {
         return rsiRepository.getUser(id);
