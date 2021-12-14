@@ -1,11 +1,20 @@
 package com.example.rsiadvisor;
 
 public class AlertDto {
+    private int id;
     private String symbol;
     private double closingPrice;
     private double rsi;
     private int rsiFilter;
     private String rsiTimeframe;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getSymbol() {
         return symbol;
