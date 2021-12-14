@@ -121,6 +121,17 @@ public class RsiRepository {
         paramMap.put("id", id);
         return jdbcTemplate.queryForObject(sql, paramMap, String.class);
     }
+    //OTSIB KAS TABELIS ON JUBA SAMA ALARM
+    public int checkUserAlarm(int symbolId,int userId,int rsiFilter,String rsiTimeframe) {
+        String sql = "SELECT id FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
+        paramMap.put("userId", userId);
+        paramMap.put("rsiFilter", rsiFilter);
+        paramMap.put("rsiTimeframe", rsiTimeframe);
+        return jdbcTemplate.queryForObject(sql, paramMap, Integer.class);
+
+    }
 
 // Tsyklilise kontrolli alarmi kustutamine
     public void deleteUserAlarm(int userId,int symbolId,String rsiTimeframe,String rsiTable) {
@@ -170,6 +181,15 @@ public class RsiRepository {
     }
 
 
+    public void updateUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
+        String sql = "UPDATE user_symbol SET rsi_filter=:rsiFilter WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_timeframe=:rsiTimeframe";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("rsiFilter", rsiFilter);
+        paramMap.put("symbolId", symbolId);
+        paramMap.put("userId", userId);
+        paramMap.put("rsiTimeframe", rsiTimeframe);
+        jdbcTemplate.update(sql, paramMap);
+    }
 }
 
 

@@ -1,8 +1,6 @@
 package com.example.rsiadvisor;
 
 
-import netscape.javascript.JSObject;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -44,12 +42,11 @@ public class RsiService {
     public void addCurrentPriceTable() {
 
 
-    RestTemplate currentPrice = new RestTemplate();
-    ResponseEntity<Object> responseEntity = currentPrice.getForEntity("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT" , Object.class);
+        RestTemplate currentPrice = new RestTemplate();
+        ResponseEntity<Object> responseEntity = currentPrice.getForEntity("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT", Object.class);
 
-    double priceString = Double.parseDouble(responseEntity.getBody().toString().substring(23,31));
+        double priceString = Double.parseDouble(responseEntity.getBody().toString().substring(23, 31));
         System.out.println(priceString);
-
 
 
     }
@@ -72,7 +69,7 @@ public class RsiService {
 
             String mySecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcnRsYWFuc2FsdUBnbWFpbC5jb20iLCJpYXQiOjE2MzkzOTI5MTQsImV4cCI6Nzk0NjU5MjkxNH0.ETkXOxvh6V_J-LnEXZuLeF9qQYiDY8l6tU91zi4ksK0";
             RestTemplate restTemplateTaapio = new RestTemplate();
-            ResponseEntity<Object> responseEntityTaapio= restTemplateTaapio.getForEntity("https://api.taapi.io/rsi?secret="+mySecret+"&exchange=binance&symbol="+symbolDataList.get(i).getSymbols().substring(0,3)+"/USDT&interval=1d&backtrack=1", Object.class);
+            ResponseEntity<Object> responseEntityTaapio = restTemplateTaapio.getForEntity("https://api.taapi.io/rsi?secret=" + mySecret + "&exchange=binance&symbol=" + symbolDataList.get(i).getSymbols().substring(0, 3) + "/USDT&interval=1d&backtrack=1", Object.class);
             String rsiString = responseEntityTaapio.getBody().toString().substring(7, 13);
             double rsiDouble = Double.parseDouble(rsiString);
 
@@ -97,7 +94,7 @@ public class RsiService {
                     .atZone(ZoneId.of("GMT"))
                     .format(formatter);
 
-            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(),rsiDouble,
+            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), rsiDouble,
                     date, closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
 
             System.out.println(closeHistory);
@@ -125,10 +122,9 @@ public class RsiService {
 
             String mySecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcnRsYWFuc2FsdUBnbWFpbC5jb20iLCJpYXQiOjE2MzkzOTI5MTQsImV4cCI6Nzk0NjU5MjkxNH0.ETkXOxvh6V_J-LnEXZuLeF9qQYiDY8l6tU91zi4ksK0";
             RestTemplate restTemplateTaapio = new RestTemplate();
-            ResponseEntity<Object> responseEntityTaapio= restTemplateTaapio.getForEntity("https://api.taapi.io/rsi?secret="+mySecret+"&exchange=binance&symbol="+symbolDataList.get(i).getSymbols().substring(0,3)+"/USDT&interval=1h&backtrack=1", Object.class);
+            ResponseEntity<Object> responseEntityTaapio = restTemplateTaapio.getForEntity("https://api.taapi.io/rsi?secret=" + mySecret + "&exchange=binance&symbol=" + symbolDataList.get(i).getSymbols().substring(0, 3) + "/USDT&interval=1h&backtrack=1", Object.class);
             String rsiString = responseEntityTaapio.getBody().toString().substring(7, 13);
             double rsiDouble = Double.parseDouble(rsiString);
-
 
 
             RestTemplate restTemplate = new RestTemplate();
@@ -163,39 +159,38 @@ public class RsiService {
     //SEND DAILY ALARM**********************************************************************************************
 
     @Scheduled(cron = "30 0 22 ? * * ")                  // iga p2ev p2rast syda88d 30 sekundit teeb kontrolli,GMT
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailDaily() throws MessagingException {
 
-        List<SymbolDto>symbolList=rsiRepository.getSymbols();
-        for(int j = 0 ;j<symbolList.size();j++) {
+        List<SymbolDto> symbolList = rsiRepository.getSymbols();
+        for (int j = 0; j < symbolList.size(); j++) {
 
             List<Integer> userId = rsiRepository.getAllUserRsiComparisonDaily(symbolList.get(j).getSymbolId());
 
             for (int i = 0; i < userId.size(); i++) {
-                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() +" daily ", "Your Daily timeframe "+symbolList.get(j).getSymbols()+" alarm was triggered.");
-                rsiRepository.deleteUserAlarm(userId.get(i),symbolList.get(j).getSymbolId(),"1D"," rsi_daily ");
+                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() + " daily ", "Your Daily timeframe " + symbolList.get(j).getSymbols() + " alarm was triggered.");
+                rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1D", " rsi_daily ");
             }
         }
     }
     //SEND HOURLY ALARM**********************************************************************************************
 
     @Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailHourly() throws MessagingException {
 
-        List<SymbolDto>symbolList=rsiRepository.getSymbols();
-        for(int j = 0 ;j<symbolList.size();j++) {
+        List<SymbolDto> symbolList = rsiRepository.getSymbols();
+        for (int j = 0; j < symbolList.size(); j++) {
 
 
             List<Integer> userId = rsiRepository.getAllUserRsiComparisonHourly(symbolList.get(j).getSymbolId());
 
             for (int i = 0; i < userId.size(); i++) {
-                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() +"  hourly ", "Your hourly timeframe "+symbolList.get(j).getSymbols()+" alarm was triggered.");
-                rsiRepository.deleteUserAlarm(userId.get(i),symbolList.get(j).getSymbolId(),"1H"," rsi_hourly ");
+                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() + "  hourly ", "Your hourly timeframe " + symbolList.get(j).getSymbols() + " alarm was triggered.");
+                rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1H", " rsi_hourly ");
             }
         }
     }
-
 
 
     public UsersDto getUser(int id) {
@@ -206,15 +201,23 @@ public class RsiService {
         if (rsiFilter < 1 || rsiFilter > 100) {
             throw new ApplicationException("Rsi filter should be 1 => 100!");
         }
-        rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
-        Email.send(rsiRepository.getUserEmail(userId), "Notification",
-                rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
-                        rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
+        if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe) > 0) {
+
+            rsiRepository.updateUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe);
+
+        } else {
+            rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
+            Email.send(rsiRepository.getUserEmail(userId), "Notification",
+                    rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
+                            rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
+        }
+
+
     }
 
 
     public List<AlertDto> alertList(int userId) {
-        List<AlertDto> fullAlertList= new ArrayList<>();
+        List<AlertDto> fullAlertList = new ArrayList<>();
         fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
         fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
         return fullAlertList;
