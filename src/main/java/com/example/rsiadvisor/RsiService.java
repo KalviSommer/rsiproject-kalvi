@@ -1,6 +1,8 @@
 package com.example.rsiadvisor;
 
 
+import netscape.javascript.JSObject;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -37,11 +39,27 @@ public class RsiService {
         return userId;
     }
 
+    //CURRENT PRICE TO TABLE *****************************************
+    //@EventListener(ApplicationReadyEvent.class)
+    public void addCurrentPriceTable() {
+
+
+    RestTemplate currentPrice = new RestTemplate();
+    ResponseEntity<Object> responseEntity = currentPrice.getForEntity("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT" , Object.class);
+
+    double priceString = Double.parseDouble(responseEntity.getBody().toString().substring(23,31));
+        System.out.println(priceString);
+
+
+
+    }
+
+
+//DAILY*********************************
 
     @Scheduled(cron = "10 0 22 ? * * ")           //10 sekund p2rast syda88d iga p2ev,GMT aeg
     //@EventListener(ApplicationReadyEvent.class)
-
-    public void addRsiDataDailyBtc() {
+    public void addRsiDataDaily() {
         List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
 
         LocalDateTime localDateTime = LocalDateTime.now();
@@ -90,7 +108,7 @@ public class RsiService {
 
 
     //HOURLY *******************************************************************************************************
-    @Scheduled(cron = "4 0 08/1 ? * * ")
+    @Scheduled(cron = "10 0 08/1 ? * * ")
     //@EventListener(ApplicationReadyEvent.class)
 
     public void addRsiDataHourly() {
@@ -144,8 +162,8 @@ public class RsiService {
 
     //SEND DAILY ALARM**********************************************************************************************
 
-    //@Scheduled(cron = "30 0 22 ? * * ")                  // iga p2ev p2rast syda88d 30 sekundit teeb kontrolli,GMT
-    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "30 0 22 ? * * ")                  // iga p2ev p2rast syda88d 30 sekundit teeb kontrolli,GMT
+    //@EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailDaily() throws MessagingException {
 
         List<SymbolDto>symbolList=rsiRepository.getSymbols();
@@ -161,8 +179,8 @@ public class RsiService {
     }
     //SEND HOURLY ALARM**********************************************************************************************
 
-    //@Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
-    @EventListener(ApplicationReadyEvent.class)
+    @Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
+    //@EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailHourly() throws MessagingException {
 
         List<SymbolDto>symbolList=rsiRepository.getSymbols();
