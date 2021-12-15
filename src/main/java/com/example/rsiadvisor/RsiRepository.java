@@ -1,5 +1,6 @@
 package com.example.rsiadvisor;
 
+import com.example.rsiadvisor.Dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -8,7 +9,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +57,11 @@ public class RsiRepository {
 
     }
 
-    public UserSymbolDto getUserSymbolData(int userId, int symbolId) {
-        String sql = "SELECT *FROM user_symbol WHERE user_id = :userId AND symbol_id=:symbolId";
+    public List<UserSymbolDto> getUserSymbols(int userId) {
+        String sql = "SELECT *FROM user_symbol WHERE user_id = :userId";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
-        paramMap.put("symbolId", symbolId);
-        UserSymbolDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UserSymbolDto.class));
+        List<UserSymbolDto> result = jdbcTemplate.query(sql, paramMap, new BeanPropertyRowMapper<>(UserSymbolDto.class));
         return result;
 
     }
@@ -70,6 +69,14 @@ public class RsiRepository {
 
     public RsiDto getRsiDailyLatest(int symbolId) {
         String sql = "SELECT*FROM rsi_daily WHERE symbol_id = :symbolId ORDER BY row_id desc LIMIT 1";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("symbolId", symbolId);
+        RsiDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(RsiDto.class));
+        return result;
+    }
+
+    public RsiDto getRsiHourlyLatest(int symbolId) {
+        String sql = "SELECT*FROM rsi_hourly WHERE symbol_id = :symbolId ORDER BY row_id desc LIMIT 1";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
         RsiDto result = jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(RsiDto.class));

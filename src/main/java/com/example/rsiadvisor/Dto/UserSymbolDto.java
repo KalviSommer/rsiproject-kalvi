@@ -1,10 +1,19 @@
-package com.example.rsiadvisor;
+package com.example.rsiadvisor.Dto;
 
 public class UserSymbolDto {
     private int symbolId;
     private int userId;
     private int rsiFilter;
     private String rsiTimeframe;
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getSymbolId() {
         return symbolId;

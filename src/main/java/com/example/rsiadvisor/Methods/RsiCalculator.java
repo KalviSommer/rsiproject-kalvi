@@ -1,4 +1,4 @@
-package com.example.rsiadvisor;
+package com.example.rsiadvisor.Methods;
 
 import java.util.List;
 

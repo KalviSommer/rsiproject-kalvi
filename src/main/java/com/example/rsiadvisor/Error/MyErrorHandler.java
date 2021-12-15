@@ -1,4 +1,4 @@
-package com.example.rsiadvisor;
+package com.example.rsiadvisor.Error;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

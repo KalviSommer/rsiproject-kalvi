@@ -1,6 +1,9 @@
 package com.example.rsiadvisor;
 
 
+import com.example.rsiadvisor.Dto.*;
+import com.example.rsiadvisor.Error.ApplicationException;
+import com.example.rsiadvisor.Methods.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -217,9 +220,8 @@ public class RsiService {
                             ", rsi filter= " +
                             rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
 
-
         } else {
-            rsiRepository.updateUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe);
+            throw new ApplicationException("Alarm already exists!");
         }
 
     }
@@ -227,8 +229,35 @@ public class RsiService {
 
     public List<AlertDto> alertList(int userId) {
         List<AlertDto> fullAlertList = new ArrayList<>();
-        fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
-        fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
+        // TODO, küsi kõik user_symbolid kus user_id = userId
+        // Tee foreach tskükkel üle nende kõigi
+        List<UserSymbolDto> userSymbols = rsiRepository.getUserSymbols(userId);
+        // tsükli sees küsi kõige viimased andmed rsi tabelist
+        for (UserSymbolDto userSymbol : userSymbols) {
+            if(userSymbol.getRsiTimeframe().equals("1D")){
+                RsiDto rsiData = rsiRepository.getRsiDailyLatest(userSymbol.getSymbolId());
+                AlertDto alert = new AlertDto();
+                alert.setRsi(rsiData.getRsi());
+                alert.setClosingPrice(rsiData.getClosingPrice());
+                alert.setId(userSymbol.getId());
+                alert.setSymbol(rsiData.getSymbol());
+                alert.setRsiFilter(userSymbol.getRsiFilter());
+                alert.setRsiTimeframe("1D");
+                fullAlertList.add(alert);
+            } else {
+                RsiDto rsiData = rsiRepository.getRsiHourlyLatest(userSymbol.getSymbolId());
+                AlertDto alert = new AlertDto();
+                alert.setRsi(rsiData.getRsi());
+                alert.setClosingPrice(rsiData.getClosingPrice());
+                alert.setId(userSymbol.getId());
+                alert.setSymbol(rsiData.getSymbol());
+                alert.setRsiFilter(userSymbol.getRsiFilter());
+                alert.setRsiTimeframe("1H");
+                fullAlertList.add(alert);
+            }
+        }
+       // fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
+       // fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
         return fullAlertList;
     }
 

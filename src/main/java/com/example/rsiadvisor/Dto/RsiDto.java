@@ -1,4 +1,4 @@
-package com.example.rsiadvisor;
+package com.example.rsiadvisor.Dto;
 
 public class RsiDto {
 
@@ -9,8 +9,10 @@ private double closingPrice;
 private int rowId;
 private String symbol;
 
+    public RsiDto() {
+    }
 
-    public RsiDto(int symbolId, double rsi, String endDate, double closingPrice,String symbol) {
+    public RsiDto(int symbolId, double rsi, String endDate, double closingPrice, String symbol) {
         this.symbolId = symbolId;
         this.rsi = rsi;
         this.endDate = endDate;
