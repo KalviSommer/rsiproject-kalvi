@@ -123,7 +123,7 @@ public class RsiRepository {
     }
     //OTSIB KAS TABELIS ON JUBA SAMA ALARM
     public int checkUserAlarm(int symbolId,int userId,int rsiFilter,String rsiTimeframe) {
-        String sql = "SELECT id FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe";
+        String sql = "SELECT COUNT(*) FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
         paramMap.put("userId", userId);

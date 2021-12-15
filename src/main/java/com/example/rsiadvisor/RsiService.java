@@ -110,25 +110,30 @@ public class RsiService {
 
     public void addRsiDataHourly() {
 
-        List<SymbolDto> symbolDataList = rsiRepository.getSymbols(); // symboli tabeli data
+        List<SymbolDto> symbolDataList = rsiRepository.getSymbols();        // võtan sümbolid tabelist listi
 
         LocalDateTime localDateTime = LocalDateTime.now();
         Instant instant = localDateTime.atZone(ZoneId.of("GMT")).toInstant();
-        long timeInMillisNow = instant.toEpochMilli();// hetke aeg
-        long timeInMillis16 = timeInMillisNow - 64800000;// miinus 16 tundi, sest viimast objekti closeHistory listist ei kasuta
+        long timeInMillisNow = instant.toEpochMilli();                       // hetke aeg
+        long timeInMillis16 = timeInMillisNow - 64800000;                   // nii palju minevikku tagasi
 
 
-        for (int i = 0; i < symbolDataList.size(); i++) {
+        for (int i = 0; i < symbolDataList.size(); i++) {                   //loopime yle symboli listi
 
-            String mySecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcnRsYWFuc2FsdUBnbWFpbC5jb20iLCJpYXQiOjE2MzkzOTI5MTQsImV4cCI6Nzk0NjU5MjkxNH0.ETkXOxvh6V_J-LnEXZuLeF9qQYiDY8l6tU91zi4ksK0";
+            //SIIN KYSIME RSI V22rtuse
+            String mySecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcnRsYWFuc2FsdUBnbWFpbC5jb20iLCJpY" +
+                    "XQiOjE2MzkzOTI5MTQsImV4cCI6Nzk0NjU5MjkxNH0.ETkXOxvh6V_J-LnEXZuLeF9qQYiDY8l6tU91zi4ksK0";
             RestTemplate restTemplateTaapio = new RestTemplate();
-            ResponseEntity<Object> responseEntityTaapio = restTemplateTaapio.getForEntity("https://api.taapi.io/rsi?secret=" + mySecret + "&exchange=binance&symbol=" + symbolDataList.get(i).getSymbols().substring(0, 3) + "/USDT&interval=1h&backtrack=1", Object.class);
+            ResponseEntity<Object> responseEntityTaapio = restTemplateTaapio.getForEntity
+                    ("https://api.taapi.io/rsi?secret=" + mySecret + "&exchange=binance&symbol="
+                            + symbolDataList.get(i).getSymbols().substring(0, 3) + "/USDT&interval=1h&backtrack=1", Object.class);
             String rsiString = responseEntityTaapio.getBody().toString().substring(7, 13);
             double rsiDouble = Double.parseDouble(rsiString);
 
-
+            // SIIN KYSIME K6IK MUU INFO
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1h&symbol=" + symbolDataList.get(i).getSymbols() + "&startTime=" + timeInMillis16, List.class);
+            ResponseEntity<List> responseEntity = restTemplate.getForEntity("https://api.binance.com/api/v3/klines?interval=1h&symbol="
+                    + symbolDataList.get(i).getSymbols() + "&startTime=" + timeInMillis16, List.class);
 
             List elements = responseEntity.getBody();
             List<Double> closeHistory = new ArrayList<>();
@@ -136,20 +141,21 @@ public class RsiService {
             for (Object element : elements) {
                 List sublist = (List) element;
                 closeTimeHistory.add(Long.parseLong(sublist.get(6).toString()));
-                closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // pmst teeb stringist double
+                closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // teeb stringist double
             }
             Long dateLong = closeTimeHistory.get(closeTimeHistory.size() - 2);    // leian viimase close aja milliseconds
 
-            final DateTimeFormatter formatter =                                   // siin convertin unixi inimloetavaks
+            final DateTimeFormatter formatter =                                   // siin convertin unixi close aja inimloetavaks
                     DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
             final long unixTime = dateLong;
             final String date = Instant.ofEpochMilli(unixTime)
                     .atZone(ZoneId.of("GMT+2"))
                     .format(formatter);
+            //KOGU INFO PANEME DTO sisse ja saadame tabelisse
 
-            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), rsiDouble, date, closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
+            RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), rsiDouble, date,
+                    closeHistory.get(closeHistory.size() - 2), symbolDataList.get(i).getSymbols());
 
-            System.out.println(closeHistory);
             rsiRepository.addRsiDataHourly(symbolData);
 
         }
@@ -197,22 +203,25 @@ public class RsiService {
         return rsiRepository.getUser(id);
     }
 
+
     public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe) throws MessagingException {
         if (rsiFilter < 1 || rsiFilter > 100) {
             throw new ApplicationException("Rsi filter should be 1 => 100!");
         }
 
-        if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe) > 0) {
+        if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe) < 1) {
 
-            rsiRepository.updateUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe);
-
-        } else {
             rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
             Email.send(rsiRepository.getUserEmail(userId), "Notification",
-                    rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId + ", rsi filter= " +
+                    rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId +
+                            ", rsi filter= " +
                             rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
+
+
+        } else {
+            rsiRepository.updateUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe);
         }
- 
+
     }
 
 
