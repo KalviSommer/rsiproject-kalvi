@@ -1,9 +1,9 @@
 package com.example.rsiadvisor;
 
+import com.example.rsiadvisor.Dto.AlertDto;
+import com.example.rsiadvisor.Dto.UsersDto;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
