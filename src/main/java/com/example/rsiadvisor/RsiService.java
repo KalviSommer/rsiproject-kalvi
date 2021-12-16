@@ -5,11 +5,15 @@ import com.example.rsiadvisor.Dto.*;
 import com.example.rsiadvisor.Error.ApplicationException;
 import com.example.rsiadvisor.Methods.BinanceData;
 import com.example.rsiadvisor.Methods.Email;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import com.example.rsiadvisor.Methods.Rsi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,21 +31,52 @@ public class RsiService {
     @Autowired
     private RsiRepository rsiRepository;
 
-    public Integer createNewUser(UsersDto newUser) throws MessagingException {
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    public Integer createNewUser(UsersDto newUser) throws MessagingException { 
+        if(newUser.getEmail() == null || newUser.getEmail().isBlank()){
+            throw new ApplicationException("Email is mandatory");
+        }
+        if (rsiRepository.getEmailCount(newUser.getEmail()) > 0) {
+            throw new ApplicationException("Email " + newUser.getEmail() + " already exists");
+        }
+
+        String enteredPassword = newUser.getPassword();
+        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
+        newUser.setPassword(encodedPassword);
         Integer userId = rsiRepository.createNewUser(newUser);
-        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, "
-                + rsiRepository.getUserFirstName(userId) + "\n"
+        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " + rsiRepository.getUserFirstName(userId) + "\n"
                 + "\n"
                 + "You have made the right choice to start using RSI advisor.\n"
                 + "RSI Advisor is simple to use and an efficient way to save Your time\n"
                 + "\n"
-                + "Please use your id: " + userId + " when logging in."
+                + "Please use your credentials when logging in:"
+                + "\n"
+                + "User ID: " + userId
+                + "\n"
+                + "Password: " + enteredPassword
                 + "\n"
                 + "\n"
                 + "Should you have any questions, then contact us rsiadvisor.info@gmail.com");
+
         return userId;
+
     }
 
+    public String login(Integer userId, String password) {
+        String encodedPassword = rsiRepository.getPassword(userId);
+        if (passwordEncoder.matches(password, encodedPassword)) {
+            JwtBuilder builder = Jwts.builder()
+                    .signWith(SignatureAlgorithm.HS256, "secret")
+                    .claim("userId", userId);
+            return builder.compact();
+        } else {
+            throw new ApplicationException("Wrong password");
+        }
+    }
 
     //ADD DATA TO RSI TABLES********************************************************************************************
     @Scheduled(cron = "10 0 08/1 ? * * ")

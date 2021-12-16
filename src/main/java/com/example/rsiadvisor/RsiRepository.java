@@ -20,20 +20,37 @@ public class RsiRepository {
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public Integer createNewUser(UsersDto newUser) {
-        String sql = "INSERT INTO users(first_name, last_name, email) VALUES (:firstName, :lastName, :email)";
+        String sql = "INSERT INTO users(first_name, last_name, email, password) VALUES (:firstName, :lastName, :email, :password)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("firstName", newUser.getFirstName());
         paramMap.put("lastName", newUser.getLastName());
         paramMap.put("email", newUser.getEmail());
+        paramMap.put("password", newUser.getPassword());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         return (Integer) keyHolder.getKeys().get("user_id");
     }
 
+
+    public Integer getEmailCount(String email) {
+        String sql = "SELECT COUNT (*) FROM users WHERE email = :email";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("email", email);
+        return jdbcTemplate.queryForObject(sql, paramMap, Integer.class);
+    }
+
+    public String getPassword(Integer userId) {
+        String sql = "SELECT password FROM users WHERE user_id = :userID";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userID", userId);
+        return jdbcTemplate.queryForObject(sql, paramMap, String.class);
+    }
+
     public void addRsiDataToTable(RsiDto rsi, String tableName) {
         String sql = "INSERT INTO " + tableName + "(symbol,end_date,closing_price,rsi,symbol_id) VALUES" +
                 " (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
+
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbol", rsi.getSymbol());
         paramMap.put("endDate", rsi.getEndDate());
@@ -79,12 +96,12 @@ public class RsiRepository {
         return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UsersDto.class));
     }
 
-
     // COMPARE LATEST RSI VALUE AND USER ALARM***************************************************************************
     public List<Integer> getAllUserRsiComparison(int symbolId, String timeFrame, String tableName, String crossing) {
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe=:timeFrame AND" +
                 " crossing=:crossing AND rsi_filter " + crossing + " (SELECT rsi FROM " + tableName + " WHERE" +
                 " symbol_id =:symbolId ORDER BY row_id desc LIMIT 1)";
+
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
         paramMap.put("timeFrame", timeFrame);
@@ -110,6 +127,7 @@ public class RsiRepository {
     }
 
     //OTSIB KAS TABELIS ON JUBA SAMA ALARM
+
     public int checkUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe, String crossing) {
         String sql = "SELECT COUNT(*) FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND" +
                 " rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe AND crossing=:crossing";
@@ -128,6 +146,7 @@ public class RsiRepository {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = :symbolId AND user_id=:userId AND" +
                 " rsi_timeframe=:rsiTimeframe AND rsi_filter " + crossing + " (SELECT rsi FROM " + rsiTable + " WHERE" +
                 " symbol_id = :symbolId ORDER BY row_id desc LIMIT 1)";
+
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
         paramMap.put("symbolId", symbolId);
@@ -149,6 +168,7 @@ public class RsiRepository {
         paramMap.put("rsitimeframe", rsiTimeframe);
         paramMap.put("crossing", crossing);
         jdbcTemplate.update(sql, paramMap);
+
     }
 
     public List<AlertDto> alertList(int userId, String timeframe, String tableName) {
@@ -186,6 +206,7 @@ public class RsiRepository {
         paramMap.put("rsiTimeframe", rsiTimeframe);
         jdbcTemplate.update(sql, paramMap);
     }
+
 
 }
 
