@@ -109,7 +109,7 @@ public class RsiService {
 
     //HOURLY *******************************************************************************************************
     @Scheduled(cron = "10 0 08/1 ? * * ")
-    //@EventListener(ApplicationReadyEvent.class)
+    @EventListener(ApplicationReadyEvent.class)
 
     public void addRsiDataHourly() {
 
@@ -168,17 +168,40 @@ public class RsiService {
     //SEND DAILY ALARM**********************************************************************************************
 
     @Scheduled(cron = "30 0 22 ? * * ")                  // iga p2ev p2rast syda88d 30 sekundit teeb kontrolli,GMT
-    @EventListener(ApplicationReadyEvent.class)
+    //@EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailDaily() throws MessagingException {
 
+
+        List<CrossingDto> crossing = new ArrayList<>();
+
+        CrossingDto crossingUp=new CrossingDto();
+        crossingUp.setCrossing("<");
+        crossingUp.setName("crossing up");
+
+        CrossingDto crossingDown=new CrossingDto();
+        crossingDown.setCrossing(">");
+        crossingDown.setName("crossing down");
+
+        crossing.add(crossingDown);
+        crossing.add(crossingUp);
+
         List<SymbolDto> symbolList = rsiRepository.getSymbols();
-        for (int j = 0; j < symbolList.size(); j++) {
+        for (int k = 0; k < crossing.size(); k++) {
 
-            List<Integer> userId = rsiRepository.getAllUserRsiComparisonDaily(symbolList.get(j).getSymbolId());
 
-            for (int i = 0; i < userId.size(); i++) {
-                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() + " daily ", "Your Daily timeframe " + symbolList.get(j).getSymbols() + " alarm was triggered.");
-                rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1D", " rsi_daily ");
+            for (int j = 0; j < symbolList.size(); j++) {
+
+                List<Integer> userId = rsiRepository.getAllUserRsiComparison(symbolList.get(j).getSymbolId(),
+                        "1D", " rsi_daily", crossing.get(k).getCrossing());
+
+                for (int i = 0; i < userId.size(); i++) {
+                    Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols()
+                            + " daily ", "Your Daily timeframe "+ symbolList.get(j).getSymbols() +" "+
+                            crossing.get(k).getName()+ " alarm was triggered.");
+
+                    rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1D",
+                            " rsi_daily ",crossing.get(k).getCrossing());
+                }
             }
         }
     }
@@ -188,15 +211,37 @@ public class RsiService {
     @EventListener(ApplicationReadyEvent.class)
     public void SendAlarmEmailHourly() throws MessagingException {
 
+        List<CrossingDto> crossing = new ArrayList<>();
+
+        CrossingDto crossingUp=new CrossingDto();
+        crossingUp.setCrossing("<");
+        crossingUp.setName("crossing up");
+
+        CrossingDto crossingDown=new CrossingDto();
+        crossingDown.setCrossing(">");
+        crossingDown.setName("crossing down");
+
+        crossing.add(crossingDown);
+        crossing.add(crossingUp);
+
         List<SymbolDto> symbolList = rsiRepository.getSymbols();
-        for (int j = 0; j < symbolList.size(); j++) {
+        for (int k = 0; k < crossing.size(); k++) {
 
 
-            List<Integer> userId = rsiRepository.getAllUserRsiComparisonHourly(symbolList.get(j).getSymbolId());
+            for (int j = 0; j < symbolList.size(); j++) {
 
-            for (int i = 0; i < userId.size(); i++) {
-                Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() + "  hourly ", "Your hourly timeframe " + symbolList.get(j).getSymbols() + " alarm was triggered.");
-                rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1H", " rsi_hourly ");
+
+                List<Integer> userId = rsiRepository.getAllUserRsiComparison(symbolList.get(j).getSymbolId(),
+                        "1H", " rsi_hourly", crossing.get(k).getCrossing());
+
+                for (int i = 0; i < userId.size(); i++) {
+                    Email.send(rsiRepository.getUserEmail(userId.get(i)), symbolList.get(j).getSymbols() +
+                            "  hourly ", "Your hourly timeframe " + symbolList.get(j).getSymbols() +" "+
+                            crossing.get(k).getName()+ " alarm was triggered.");
+
+                    rsiRepository.deleteUserAlarm(userId.get(i), symbolList.get(j).getSymbolId(), "1H",
+                            " rsi_hourly ",crossing.get(k).getCrossing());
+                }
             }
         }
     }
@@ -207,18 +252,17 @@ public class RsiService {
     }
 
 
-    public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe) throws MessagingException {
+    public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe,String crossing) throws MessagingException {
         if (rsiFilter < 1 || rsiFilter > 100) {
             throw new ApplicationException("Rsi filter should be 1 => 100!");
         }
 
-        if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe) < 1) {
+        if (rsiRepository.checkUserAlarm(symbolId, userId, rsiFilter, rsiTimeframe,crossing) < 1) {
 
-            rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe);
+            rsiRepository.setAlert(symbolId, userId, rsiFilter, rsiTimeframe,crossing);
             Email.send(rsiRepository.getUserEmail(userId), "Notification",
-                    rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= " + symbolId +
-                            ", rsi filter= " +
-                            rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
+                    rsiRepository.getUserFirstName(userId) + ", inserted new alert by details: symbol= "
+                            + symbolId + ", rsi filter= " + rsiFilter + ", rsi timeframe= " + rsiTimeframe + "!");
 
         } else {
             throw new ApplicationException("Alarm already exists!");
@@ -243,6 +287,7 @@ public class RsiService {
                 alert.setSymbol(rsiData.getSymbol());
                 alert.setRsiFilter(userSymbol.getRsiFilter());
                 alert.setRsiTimeframe("1D");
+                alert.setCrossing(userSymbol.getCrossing());
                 fullAlertList.add(alert);
             } else {
                 RsiDto rsiData = rsiRepository.getRsiHourlyLatest(userSymbol.getSymbolId());
@@ -253,11 +298,11 @@ public class RsiService {
                 alert.setSymbol(rsiData.getSymbol());
                 alert.setRsiFilter(userSymbol.getRsiFilter());
                 alert.setRsiTimeframe("1H");
+                alert.setCrossing(userSymbol.getCrossing());
                 fullAlertList.add(alert);
             }
         }
-       // fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
-       // fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
+
         return fullAlertList;
     }
 

@@ -7,6 +7,15 @@ public class AlertDto {
     private double rsi;
     private int rsiFilter;
     private String rsiTimeframe;
+    private String crossing;
+
+    public String getCrossing() {
+        return crossing;
+    }
+
+    public void setCrossing(String crossing) {
+        this.crossing = crossing;
+    }
 
     public int getId() {
         return id;

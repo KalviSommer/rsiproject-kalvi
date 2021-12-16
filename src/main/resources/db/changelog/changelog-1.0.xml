@@ -161,4 +161,10 @@
             <column name="symbols" value="BNBUSDT"></column>
         </insert>
     </changeSet>
+    <changeSet id="15-12-2021" author="Mart">
+        <addColumn tableName="user_symbol">
+            <column name="crossing" type="text">
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
