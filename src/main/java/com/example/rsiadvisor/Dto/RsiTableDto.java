@@ -9,7 +9,7 @@ public class RsiTableDto {
     public RsiTableDto() {
     }
 
-    public RsiTableDto(String timeframe, int timeMillis,String tableName) {
+    public RsiTableDto(String timeframe, int timeMillis, String tableName) {
         this.timeframe = timeframe;
         this.timeMillis = timeMillis;
         this.tableName = tableName;

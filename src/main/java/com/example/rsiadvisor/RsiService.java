@@ -220,8 +220,6 @@ public class RsiService {
     }
 
 
-
-
     public void deleteAlert(int n) {
         rsiRepository.deleteAlert(n);
     }

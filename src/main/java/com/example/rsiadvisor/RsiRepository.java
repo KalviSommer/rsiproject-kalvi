@@ -32,7 +32,7 @@ public class RsiRepository {
     }
 
     public void addRsiDataToTable(RsiDto rsi, String tableName) {
-        String sql = "INSERT INTO "+tableName+"(symbol,end_date,closing_price,rsi,symbol_id) VALUES" +
+        String sql = "INSERT INTO " + tableName + "(symbol,end_date,closing_price,rsi,symbol_id) VALUES" +
                 " (:symbol, :endDate, :closingPrice,:rsi,:symbolId)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbol", rsi.getSymbol());
@@ -80,10 +80,10 @@ public class RsiRepository {
     }
 
 
-// COMPARE LATEST RSI VALUE AND USER ALARM***************************************************************************
-    public List<Integer> getAllUserRsiComparison(int symbolId, String timeFrame, String tableName,String crossing) {
+    // COMPARE LATEST RSI VALUE AND USER ALARM***************************************************************************
+    public List<Integer> getAllUserRsiComparison(int symbolId, String timeFrame, String tableName, String crossing) {
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe=:timeFrame AND" +
-                " crossing=:crossing AND rsi_filter "+crossing+" (SELECT rsi FROM "+tableName+" WHERE" +
+                " crossing=:crossing AND rsi_filter " + crossing + " (SELECT rsi FROM " + tableName + " WHERE" +
                 " symbol_id =:symbolId ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
@@ -110,7 +110,7 @@ public class RsiRepository {
     }
 
     //OTSIB KAS TABELIS ON JUBA SAMA ALARM
-    public int checkUserAlarm(int symbolId,int userId,int rsiFilter,String rsiTimeframe,String crossing) {
+    public int checkUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe, String crossing) {
         String sql = "SELECT COUNT(*) FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND" +
                 " rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe AND crossing=:crossing";
         Map<String, Object> paramMap = new HashMap<>();
@@ -123,10 +123,10 @@ public class RsiRepository {
 
     }
 
-// Tsyklilise kontrolli alarmi kustutamine
-    public void deleteUserAlarm(int userId,int symbolId,String rsiTimeframe,String rsiTable,String crossing) {
+    // Tsyklilise kontrolli alarmi kustutamine
+    public void deleteUserAlarm(int userId, int symbolId, String rsiTimeframe, String rsiTable, String crossing) {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = :symbolId AND user_id=:userId AND" +
-                " rsi_timeframe=:rsiTimeframe AND rsi_filter "+crossing+" (SELECT rsi FROM " + rsiTable + " WHERE" +
+                " rsi_timeframe=:rsiTimeframe AND rsi_filter " + crossing + " (SELECT rsi FROM " + rsiTable + " WHERE" +
                 " symbol_id = :symbolId ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
@@ -138,8 +138,7 @@ public class RsiRepository {
     }
 
 
-
-    public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe,String crossing) {
+    public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe, String crossing) {
 
         String sql = "INSERT INTO user_symbol (symbol_id, user_id, rsi_filter, rsi_timeframe, crossing) " +
                 "VALUES (:symbolid, :userid, :rsifilter, :rsitimeframe,:crossing)";
@@ -175,7 +174,6 @@ public class RsiRepository {
         paramMap.put("id", n);
         jdbcTemplate.update(sql, paramMap);
     }
-
 
 
     public void updateUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {

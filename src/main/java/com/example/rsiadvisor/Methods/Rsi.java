@@ -3,43 +3,21 @@ package com.example.rsiadvisor.Methods;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-
 public class Rsi {
 
-    public static double getRsi(String symbol,String timeframe) {
+    public static double getRsi(String symbol, String timeframe) {
         String mySecret = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1hcnRsYWFuc2FsdUBnbWFpbC5jb20i" +
                 "LCJpYXQiOjE2MzkzOTI5MTQsImV4cCI6Nzk0NjU5MjkxNH0.ETkXOxvh6V_J-LnEXZuLeF9qQYiDY8l6tU91zi4ksK0";
 
         RestTemplate restTemplateTaapio = new RestTemplate();
         ResponseEntity<Object> responseEntityTaapio = restTemplateTaapio.getForEntity
                 ("https://api.taapi.io/rsi?secret=" + mySecret + "&exchange=binance&symbol="
-                        +symbol + "/USDT&interval=" + timeframe+ "&backtrack=1", Object.class);
+                        + symbol + "/USDT&interval=" + timeframe + "&backtrack=1", Object.class);
 
         String rsiString = responseEntityTaapio.getBody().toString().substring(7, 13);
         double rsiDouble = Double.parseDouble(rsiString);
         return rsiDouble;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 //    public static double calculate(List<Double> data) {
