@@ -4,6 +4,14 @@ public class CrossingDto {
     private String crossing;
     private String name;
 
+    public CrossingDto() {
+    }
+
+    public CrossingDto(String crossing, String name) {
+        this.crossing = crossing;
+        this.name = name;
+    }
+
     public String getCrossing() {
         return crossing;
     }

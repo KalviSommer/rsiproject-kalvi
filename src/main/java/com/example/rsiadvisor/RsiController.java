@@ -37,8 +37,11 @@ public class RsiController {
 
     // http://localhost:8190/rsiadvisor/setAlert/
     @PostMapping("rsiadvisor/setAlert/{symbolId}/{userId}/{rsiFilter}/{rsiTimeframe}/{crossing}")
-    public void setAlert(@PathVariable("symbolId") int symbolId, @PathVariable("userId") int userId,
-                              @PathVariable ("rsiFilter") int rsiFilter, @PathVariable("rsiTimeframe") String rsiTimeframe,@PathVariable("crossing") String crossing) throws MessagingException {
+    public void setAlert(@PathVariable("symbolId") int symbolId,
+                         @PathVariable("userId") int userId,
+                         @PathVariable ("rsiFilter") int rsiFilter,
+                         @PathVariable("rsiTimeframe") String rsiTimeframe,
+                         @PathVariable("crossing") String crossing) throws MessagingException {
         rsiService.setAlert(symbolId, userId, rsiFilter, rsiTimeframe,crossing);
     }
 
