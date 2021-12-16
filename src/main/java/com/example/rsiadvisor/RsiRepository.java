@@ -20,15 +20,30 @@ public class RsiRepository {
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     public Integer createNewUser(UsersDto newUser) {
-        String sql = "INSERT INTO users(first_name, last_name, email) VALUES (:firstName, :lastName, :email)";
+        String sql = "INSERT INTO users(first_name, last_name, email, password) VALUES (:firstName, :lastName, :email, :password)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("firstName", newUser.getFirstName());
         paramMap.put("lastName", newUser.getLastName());
         paramMap.put("email", newUser.getEmail());
+        paramMap.put("password", newUser.getPassword());
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
         return (Integer) keyHolder.getKeys().get("user_id");
+    }
+
+    public Integer getEmailCount(String email) {
+        String sql = "SELECT COUNT (*) FROM users WHERE email = :email";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("email", email);
+        return jdbcTemplate.queryForObject(sql, paramMap, Integer.class);
+    }
+
+    public String getPassword(Integer userId) {
+        String sql = "SELECT password FROM users WHERE user_id = :userID";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userID", userId);
+        return jdbcTemplate.queryForObject(sql, paramMap, String.class);
     }
 
     public void addRsiDataDaily(RsiDto rsi) {
@@ -91,7 +106,7 @@ public class RsiRepository {
     }
 
 
-// ALARM COMPARSION DAILY***************************************************************************
+    // ALARM COMPARSION DAILY***************************************************************************
     public List<Integer> getAllUserRsiComparisonDaily(int symbolId) {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe='1D' AND\n" +
                 "                rsi_filter > (SELECT rsi FROM rsi_daily WHERE symbol_id = 1 ORDER BY row_id desc LIMIT 1)";
@@ -100,6 +115,7 @@ public class RsiRepository {
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
 
     }
+
     // ALARM COMPARSION HOURLY
     public List<Integer> getAllUserRsiComparisonHourly(int symbolId) {    // TAGASTAB LISTI USER ID KELLEL ALARM L2KS K2ima
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe='1H' AND\n" +
@@ -108,9 +124,6 @@ public class RsiRepository {
         paramMap.put("symbolId", symbolId);
         return jdbcTemplate.queryForList(sql, paramMap, Integer.class);
     }
-
-
-
 
 
     public String getUserEmail(int id) {
@@ -128,8 +141,9 @@ public class RsiRepository {
         paramMap.put("id", id);
         return jdbcTemplate.queryForObject(sql, paramMap, String.class);
     }
+
     //OTSIB KAS TABELIS ON JUBA SAMA ALARM
-    public int checkUserAlarm(int symbolId,int userId,int rsiFilter,String rsiTimeframe) {
+    public int checkUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
         String sql = "SELECT COUNT(*) FROM user_symbol WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_filter=:rsiFilter AND rsi_timeframe=:rsiTimeframe";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("symbolId", symbolId);
@@ -140,8 +154,8 @@ public class RsiRepository {
 
     }
 
-// Tsyklilise kontrolli alarmi kustutamine
-    public void deleteUserAlarm(int userId,int symbolId,String rsiTimeframe,String rsiTable) {
+    // Tsyklilise kontrolli alarmi kustutamine
+    public void deleteUserAlarm(int userId, int symbolId, String rsiTimeframe, String rsiTable) {
         String sql = "DELETE FROM user_symbol WHERE symbol_id = :symbolId AND user_id=:userId AND rsi_timeframe=:rsiTimeframe AND rsi_filter > (SELECT rsi FROM" + rsiTable + " WHERE symbol_id = :symbolId ORDER BY row_id desc LIMIT 1)";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userId", userId);
@@ -151,7 +165,6 @@ public class RsiRepository {
 
         jdbcTemplate.update(sql, paramMap);
     }
-
 
 
     public void setAlert(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
@@ -188,7 +201,6 @@ public class RsiRepository {
     }
 
 
-
     public void updateUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
         String sql = "UPDATE user_symbol SET rsi_filter=:rsiFilter WHERE symbol_id=:symbolId AND user_id=:userId AND rsi_timeframe=:rsiTimeframe";
         Map<String, Object> paramMap = new HashMap<>();
@@ -198,6 +210,7 @@ public class RsiRepository {
         paramMap.put("rsiTimeframe", rsiTimeframe);
         jdbcTemplate.update(sql, paramMap);
     }
+
 
 }
 

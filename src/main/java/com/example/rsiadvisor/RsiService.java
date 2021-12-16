@@ -4,11 +4,15 @@ package com.example.rsiadvisor;
 import com.example.rsiadvisor.Dto.*;
 import com.example.rsiadvisor.Error.ApplicationException;
 import com.example.rsiadvisor.Methods.Email;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,19 +31,53 @@ public class RsiService {
     @Autowired
     private RsiRepository rsiRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
     public Integer createNewUser(UsersDto newUser) throws MessagingException { //ennem public String createAccount(@PathVariable("accountNr") String accountNr )
+        if(newUser.getEmail() == null || newUser.getEmail().isBlank()){
+            throw new ApplicationException("Email is mandatory");
+        }
+        if (rsiRepository.getEmailCount(newUser.getEmail()) > 0) {
+            throw new ApplicationException("Email " + newUser.getEmail() + " already exists");
+        }
+
+        String enteredPassword = newUser.getPassword();
+        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
+        newUser.setPassword(encodedPassword);
         Integer userId = rsiRepository.createNewUser(newUser);
+
         Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " + rsiRepository.getUserFirstName(userId) + "\n"
                 + "\n"
                 + "You have made the right choice to start using RSI advisor.\n"
                 + "RSI Advisor is simple to use and an efficient way to save Your time\n"
                 + "\n"
-                + "Please use your id: " + userId + " when logging in."
+                + "Please use your credentials when logging in:"
+                + "\n"
+                + "User ID: " + userId
+                + "\n"
+                + "Password: " + enteredPassword
                 + "\n"
                 + "\n"
                 + "Should you have any questions, then contact us rsiadvisor.info@gmail.com");
+
         return userId;
+
     }
+
+    public String login(Integer userId, String password) {
+        String encodedPassword = rsiRepository.getPassword(userId);
+        if (passwordEncoder.matches(password, encodedPassword)) {
+            JwtBuilder builder = Jwts.builder()
+                    .signWith(SignatureAlgorithm.HS256, "secret")
+                    .claim("userId", userId);
+            return builder.compact();
+        } else {
+            throw new ApplicationException("Wrong password");
+        }
+    }
+
 
     //CURRENT PRICE TO TABLE *****************************************
     //@EventListener(ApplicationReadyEvent.class)
@@ -234,7 +273,7 @@ public class RsiService {
         List<UserSymbolDto> userSymbols = rsiRepository.getUserSymbols(userId);
         // tsükli sees küsi kõige viimased andmed rsi tabelist
         for (UserSymbolDto userSymbol : userSymbols) {
-            if(userSymbol.getRsiTimeframe().equals("1D")){
+            if (userSymbol.getRsiTimeframe().equals("1D")) {
                 RsiDto rsiData = rsiRepository.getRsiDailyLatest(userSymbol.getSymbolId());
                 AlertDto alert = new AlertDto();
                 alert.setRsi(rsiData.getRsi());
@@ -256,8 +295,8 @@ public class RsiService {
                 fullAlertList.add(alert);
             }
         }
-       // fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
-       // fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
+        // fullAlertList.addAll(rsiRepository.alertList(userId, "1D", "rsi_daily"));
+        // fullAlertList.addAll(rsiRepository.alertList(userId, "1H", "rsi_hourly"));
         return fullAlertList;
     }
 
