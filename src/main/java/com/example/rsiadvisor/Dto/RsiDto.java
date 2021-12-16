@@ -8,6 +8,15 @@ private String endDate;
 private double closingPrice;
 private int rowId;
 private String symbol;
+private String crossing;
+
+    public String getCrossing() {
+        return crossing;
+    }
+
+    public void setCrossing(String crossing) {
+        this.crossing = crossing;
+    }
 
     public RsiDto() {
     }
