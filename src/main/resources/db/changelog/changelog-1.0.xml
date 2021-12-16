@@ -162,6 +162,7 @@
         </insert>
     </changeSet>
 
+
     <changeSet id="15.12.2021 add column password" author="ailen">
         <addColumn tableName="users">
             <column name="password" type="text"></column>
@@ -180,6 +181,14 @@
     
     <changeSet id="16.12.2021" author="ailen">
         <addUniqueConstraint tableName="users" columnNames="email"/>
+    </changeSet>
+
+
+    <changeSet id="15-12-2021" author="Mart">
+        <addColumn tableName="user_symbol">
+            <column name="crossing" type="text">
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>
