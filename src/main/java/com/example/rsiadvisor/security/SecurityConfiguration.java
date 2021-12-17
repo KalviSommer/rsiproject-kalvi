@@ -1,4 +1,4 @@
-package com.example.rsiadvisor.Security;
+package com.example.rsiadvisor.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,8 +22,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(new JwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//        http.authorizeRequests()
-//                .anyRequest().permitAll();
         http.csrf().disable();
     }
 

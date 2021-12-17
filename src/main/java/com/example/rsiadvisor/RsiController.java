@@ -1,8 +1,8 @@
 package com.example.rsiadvisor;
 
-import com.example.rsiadvisor.Dto.AlertDto;
-import com.example.rsiadvisor.Dto.LoginRequest;
-import com.example.rsiadvisor.Dto.UsersDto;
+import com.example.rsiadvisor.dto.AlertDto;
+import com.example.rsiadvisor.dto.LoginRequest;
+import com.example.rsiadvisor.dto.UsersDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +20,6 @@ public class RsiController {
     //    http://localhost:8190/rsiadvisor/newuser
     @PostMapping("rsiadvisor/public/newuser")
     public Integer createNewUser(@RequestBody UsersDto newUser) throws MessagingException {
-
         return rsiService.createNewUser(newUser);
     }
 
@@ -29,7 +28,7 @@ public class RsiController {
         return rsiService.login(request.getUserId(), request.getPassword());
     }
 
-     // http://localhost:8190/rsiadvisor/getuser/
+    // http://localhost:8190/rsiadvisor/getuser/
     @GetMapping("rsiadvisor/getuser/{id}")
     public UsersDto getUser(@PathVariable("id") int id) {
         return rsiService.getUser(id);

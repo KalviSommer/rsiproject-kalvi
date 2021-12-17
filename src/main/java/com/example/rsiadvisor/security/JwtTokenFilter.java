@@ -1,4 +1,4 @@
-package com.example.rsiadvisor.Security;
+package com.example.rsiadvisor.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

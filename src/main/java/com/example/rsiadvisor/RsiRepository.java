@@ -1,6 +1,6 @@
 package com.example.rsiadvisor;
 
-import com.example.rsiadvisor.Dto.*;
+import com.example.rsiadvisor.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -96,7 +96,7 @@ public class RsiRepository {
         return jdbcTemplate.queryForObject(sql, paramMap, new BeanPropertyRowMapper<>(UsersDto.class));
     }
 
-    // COMPARE LATEST RSI VALUE AND USER ALARM***************************************************************************
+    // COMPARE LATEST RSI VALUE AND USER ALARM
     public List<Integer> getAllUserRsiComparison(int symbolId, String timeFrame, String tableName, String crossing) {
         String sql = "SELECT user_id FROM user_symbol WHERE symbol_id = :symbolId AND rsi_timeframe=:timeFrame AND" +
                 " crossing=:crossing AND rsi_filter " + crossing + " (SELECT rsi FROM " + tableName + " WHERE" +
@@ -171,16 +171,6 @@ public class RsiRepository {
 
     }
 
-    public List<AlertDto> alertList(int userId, String timeframe, String tableName) {
-        String sql = "WITH all_alerts AS (SELECT *, ROW_NUMBER() OVER(PARTITION BY r.symbol_id, u.rsi_timeframe" +
-                "  ORDER BY r.end_date DESC) AS rn FROM user_symbol u JOIN " + tableName + " r ON" +
-                " u.symbol_id = r.symbol_id WHERE u.user_id=:userId AND u.rsi_timeframe=:rsiTimeframe)" +
-                " select * from all_alerts where rn=1";
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("userId", userId);
-        paramMap.put("rsiTimeframe", timeframe);
-        return jdbcTemplate.query(sql, paramMap, new BeanPropertyRowMapper<>(AlertDto.class));
-    }
 
     public List<SymbolDto> getSymbols() {
         String sql = "SELECT*FROM symbol";
@@ -194,19 +184,6 @@ public class RsiRepository {
         paramMap.put("id", n);
         jdbcTemplate.update(sql, paramMap);
     }
-
-
-    public void updateUserAlarm(int symbolId, int userId, int rsiFilter, String rsiTimeframe) {
-        String sql = "UPDATE user_symbol SET rsi_filter=:rsiFilter WHERE symbol_id=:symbolId AND user_id=:userId AND" +
-                " rsi_timeframe=:rsiTimeframe";
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("rsiFilter", rsiFilter);
-        paramMap.put("symbolId", symbolId);
-        paramMap.put("userId", userId);
-        paramMap.put("rsiTimeframe", rsiTimeframe);
-        jdbcTemplate.update(sql, paramMap);
-    }
-
 
 }
 

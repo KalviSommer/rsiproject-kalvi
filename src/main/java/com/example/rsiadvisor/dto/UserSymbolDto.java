@@ -1,12 +1,11 @@
-package com.example.rsiadvisor.Dto;
+package com.example.rsiadvisor.dto;
 
-public class AlertDto {
-    private int id;
-    private String symbol;
-    private double closingPrice;
-    private double rsi;
+public class UserSymbolDto {
+    private int symbolId;
+    private int userId;
     private int rsiFilter;
     private String rsiTimeframe;
+    private int id;
     private String crossing;
 
     public String getCrossing() {
@@ -25,28 +24,20 @@ public class AlertDto {
         this.id = id;
     }
 
-    public String getSymbol() {
-        return symbol;
+    public int getSymbolId() {
+        return symbolId;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public void setSymbolId(int symbolId) {
+        this.symbolId = symbolId;
     }
 
-    public double getClosingPrice() {
-        return closingPrice;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setClosingPrice(double closingPrice) {
-        this.closingPrice = closingPrice;
-    }
-
-    public double getRsi() {
-        return rsi;
-    }
-
-    public void setRsi(double rsi) {
-        this.rsi = rsi;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getRsiFilter() {
