@@ -83,8 +83,6 @@ public class RsiService {
 
     //ADD DATA TO RSI TABLES
     @Scheduled(cron = "10 0 08/1 ? * * ")
-    @EventListener(ApplicationReadyEvent.class)
-
     public void addRsiData() {
 
         List<RsiTableDto> timeframeData = new ArrayList<>();            // 1D ja 1H timeframe
@@ -141,10 +139,8 @@ public class RsiService {
     }
 
 
-    //SEND ALARM**********************************************************************************************
-
-    @Scheduled(cron = "30 0 08/1 ? * * ")                  // iga tund ja 30 sekundit GMT , teeb kontrolli
-    @EventListener(ApplicationReadyEvent.class)
+    //SEND ALARM
+    @Scheduled(cron="0/10 * * ? * *")
     public void SendAlarmEmail() throws MessagingException {
 
         List<AlarmEmailDto> timeframeData = new ArrayList<>();
