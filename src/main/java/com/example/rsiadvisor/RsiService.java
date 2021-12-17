@@ -1,14 +1,14 @@
 package com.example.rsiadvisor;
 
 
-import com.example.rsiadvisor.Dto.*;
-import com.example.rsiadvisor.Error.ApplicationException;
-import com.example.rsiadvisor.Methods.BinanceData;
-import com.example.rsiadvisor.Methods.Email;
+import com.example.rsiadvisor.dto.*;
+import com.example.rsiadvisor.error.ApplicationException;
+import com.example.rsiadvisor.methods.BinanceData;
+import com.example.rsiadvisor.methods.Email;
+import com.example.rsiadvisor.methods.Rsi;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import com.example.rsiadvisor.Methods.Rsi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -36,8 +35,8 @@ public class RsiService {
     private PasswordEncoder passwordEncoder;
 
 
-    public Integer createNewUser(UsersDto newUser) throws MessagingException { 
-        if(newUser.getEmail() == null || newUser.getEmail().isBlank()){
+    public Integer createNewUser(UsersDto newUser) throws MessagingException {
+        if (newUser.getEmail() == null || newUser.getEmail().isBlank()) {
             throw new ApplicationException("Email is mandatory");
         }
         if (rsiRepository.getEmailCount(newUser.getEmail()) > 0) {
@@ -48,7 +47,8 @@ public class RsiService {
         String encodedPassword = passwordEncoder.encode(newUser.getPassword());
         newUser.setPassword(encodedPassword);
         Integer userId = rsiRepository.createNewUser(newUser);
-        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " + rsiRepository.getUserFirstName(userId) + "\n"
+        Email.send(rsiRepository.getUserEmail(userId), "Welcome to RSI Advisor", "Welcome, " +
+                rsiRepository.getUserFirstName(userId) + "\n"
                 + "\n"
                 + "You have made the right choice to start using RSI advisor.\n"
                 + "RSI Advisor is simple to use and an efficient way to save Your time\n"
@@ -78,42 +78,33 @@ public class RsiService {
         }
     }
 
-    //ADD DATA TO RSI TABLES********************************************************************************************
+    //ADD DATA TO RSI TABLES
     @Scheduled(cron = "10 0 08/1 ? * * ")
     @EventListener(ApplicationReadyEvent.class)
 
     public void addRsiData() {
 
         List<RsiTableDto> timeframeData = new ArrayList<>();            // 1D ja 1H timeframe
-
         RsiTableDto daily = new RsiTableDto("1d", 1382400000, "rsi_daily");
         RsiTableDto hourly = new RsiTableDto("1h", 64800000, "rsi_hourly");
-
         timeframeData.add(daily);
         timeframeData.add(hourly);
 
-        List<SymbolDto> symbolDataList = rsiRepository.getSymbols();        // võtan sümbolid tabelist listi
+        List<SymbolDto> symbolDataList = rsiRepository.getSymbols();// võtan sümbolid tabelist listi
+
+        long timeInMillisNow = LocalDateTime.now().atZone(ZoneId.of("GMT")).toInstant().toEpochMilli();
+
+        for (int j = 0; j < timeframeData.size(); j++) {                    //loop yle timeframe
 
 
-        for (int j = 0; j < timeframeData.size(); j++) {
-
-
-            LocalDateTime localDateTime = LocalDateTime.now();
-            Instant instant = localDateTime.atZone(ZoneId.of("GMT")).toInstant();
-            long timeInMillisNow = instant.toEpochMilli();
             long timeInMillis = timeInMillisNow - timeframeData.get(j).getTimeMillis();
 
 
             for (int i = 0; i < symbolDataList.size(); i++) {                   //loopime yle symboli listi
 
-                //SIIN KYSIME RSI V22rtuse
 
-                double rsiDouble = Rsi.getRsi(symbolDataList.get(i).getSymbols().substring(0, 3),
+                List elements = BinanceData.binanceData(symbolDataList.get(i).getSymbols(), timeInMillis,
                         timeframeData.get(j).getTimeframe());
-
-                // SIIN KYSIME K6IK MUU INFO
-
-                List elements = BinanceData.binanceData(symbolDataList.get(i).getSymbols(), timeInMillis);
 
                 List<Double> closeHistory = new ArrayList<>();
                 List<Long> closeTimeHistory = new ArrayList<>();
@@ -122,14 +113,18 @@ public class RsiService {
                     closeTimeHistory.add(Long.parseLong(sublist.get(6).toString()));
                     closeHistory.add(Double.parseDouble(sublist.get(4).toString())); // teeb stringist double
                 }
-                Long dateLong = closeTimeHistory.get(closeTimeHistory.size() - 2);    // viimane close aeg milliseconds
 
-                final DateTimeFormatter formatter =                                   // unix aeg inimloetavaks
+                double rsiDouble = Rsi.getRsi(symbolDataList.get(i).getSymbols().substring(0, 3),
+                        timeframeData.get(j).getTimeframe());
+
+                long dateLong = closeTimeHistory.get(closeTimeHistory.size() - 2);    // viimane close aeg milliseconds
+
+                DateTimeFormatter formatter =                                   // unix aeg inimloetavaks
                         DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-                final long unixTime = dateLong;
-                final String date = Instant.ofEpochMilli(unixTime)
-                        .atZone(ZoneId.of("GMT+2"))
+                String date = Instant.ofEpochMilli(dateLong)
+                        .atZone(ZoneId.of("GMT"))
                         .format(formatter);
+
                 //KOGU INFO PANEME DTO sisse ja saadame tabelisse
 
                 RsiDto symbolData = new RsiDto(symbolDataList.get(i).getSymbolId(), rsiDouble, date,
@@ -156,7 +151,6 @@ public class RsiService {
 
         timeframeData.add(hourly);
         timeframeData.add(daily);
-
 
         List<CrossingDto> crossing = new ArrayList<>();
 
@@ -222,10 +216,9 @@ public class RsiService {
 
     public List<AlertDto> alertList(int userId) {
         List<AlertDto> fullAlertList = new ArrayList<>();
-        // TODO, küsi kõik user_symbolid kus user_id = userId
-        // Tee foreach tskükkel üle nende kõigi
+
         List<UserSymbolDto> userSymbols = rsiRepository.getUserSymbols(userId);
-        // tsükli sees küsi kõige viimased andmed rsi tabelist
+
         for (UserSymbolDto userSymbol : userSymbols) {
             if (userSymbol.getRsiTimeframe().equals("1D")) {
                 RsiDto rsiData = rsiRepository.getRsiDailyLatest(userSymbol.getSymbolId());

@@ -1,26 +1,18 @@
-package com.example.rsiadvisor.Dto;
+package com.example.rsiadvisor.dto;
 
 public class RsiTableDto {
 
     private String timeframe;
-    private int timeMillis;
+    private long timeMillis;
     private String tableName;
 
-    public RsiTableDto() {
-    }
-
-    public RsiTableDto(String timeframe, int timeMillis, String tableName) {
+    public RsiTableDto(String timeframe, long timeMillis, String tableName) {
         this.timeframe = timeframe;
         this.timeMillis = timeMillis;
         this.tableName = tableName;
     }
 
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
+    public RsiTableDto() {
     }
 
     public String getTimeframe() {
@@ -31,11 +23,19 @@ public class RsiTableDto {
         this.timeframe = timeframe;
     }
 
-    public int getTimeMillis() {
+    public long getTimeMillis() {
         return timeMillis;
     }
 
-    public void setTimeMillis(int timeMillis) {
+    public void setTimeMillis(long timeMillis) {
         this.timeMillis = timeMillis;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

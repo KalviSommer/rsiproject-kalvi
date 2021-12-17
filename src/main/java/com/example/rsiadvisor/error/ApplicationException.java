@@ -1,4 +1,4 @@
-package com.example.rsiadvisor.Error;
+package com.example.rsiadvisor.error;
 
 public class ApplicationException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.example.rsiadvisor.Methods;
+package com.example.rsiadvisor.methods;
 
 import org.springframework.web.bind.annotation.PostMapping;
 
