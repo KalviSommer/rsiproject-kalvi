@@ -33,6 +33,13 @@ public class RsiRepository {
     }
 
 
+    public Integer getUserIdCount(Integer userId) {
+        String sql = "SELECT COUNT (*) FROM users WHERE user_id = :userId";
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("userId", userId);
+        return jdbcTemplate.queryForObject(sql, paramMap, Integer.class);
+    }
+
     public Integer getEmailCount(String email) {
         String sql = "SELECT COUNT (*) FROM users WHERE email = :email";
         Map<String, Object> paramMap = new HashMap<>();
