@@ -67,6 +67,9 @@ public class RsiService {
     }
 
     public String login(Integer userId, String password) {
+        if(rsiRepository.getUserIdCount(userId) < 1) {
+            throw new ApplicationException("No such user ID");
+        }
         String encodedPassword = rsiRepository.getPassword(userId);
         if (passwordEncoder.matches(password, encodedPassword)) {
             JwtBuilder builder = Jwts.builder()
